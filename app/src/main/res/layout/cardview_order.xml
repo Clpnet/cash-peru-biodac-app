@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:theme="@style/Theme.MaterialComponents"
+    app:cardCornerRadius="8dp"
+    app:cardElevation="6dp"
+    app:cardUseCompatPadding="true"
+    app:cardPreventCornerOverlap="true"
+    android:id="@+id/cdvOrder">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#DCDCDC">
+
+        <TextView
+            android:id="@+id/lblOrderNumber"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="15dp"
+            android:layout_marginTop="15dp"
+            android:text="Nro de Orden:"
+            android:textColor="#000000" />
+
+        <TextView
+            android:id="@+id/txtOrderNumber"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="120dp"
+            android:layout_marginTop="15dp"
+            android:text="11111111111111"
+            android:textColor="#000000" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="15dp"
+            android:layout_marginTop="35dp"
+            android:text="TC"
+            android:textColor="#000000" />
+
+        <TextView
+            android:id="@+id/txtCardType"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="15dp"
+            android:layout_marginTop="55dp"
+            android:text="INTERBANK"
+            android:textColor="#000000" />
+
+        <TextView
+            android:id="@+id/lblDocumentNumber"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="15dp"
+            android:layout_marginTop="75dp"
+            android:text="N° de Documento:"
+            android:textColor="#000000" />
+
+        <TextView
+            android:id="@+id/txtDocumentNumber"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="135dp"
+            android:layout_marginTop="75dp"
+            android:text="70985144"
+            android:textColor="#000000" />
+
+        <TextView
+            android:id="@+id/txtNumberIntent"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="15dp"
+            android:layout_marginTop="95dp"
+            android:text="@string/number_intent_msg"
+            android:textColor="#000000" />
+
+        <TextView
+            android:id="@+id/txtFirstDate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_marginTop="105dp"
+            android:layout_marginEnd="15dp"
+            android:text="01/02/2023 06:05:01"
+            android:textColor="#000000" />
+
+        <TextView
+            android:id="@+id/txtSecondDate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_marginTop="130dp"
+            android:layout_marginEnd="15dp"
+            android:text="01/02/2023 12:08:01"
+            android:textColor="#000000" />
+
+        <Button
+            android:id="@+id/btnStatus"
+            android:layout_width="65dp"
+            android:layout_height="25dp"
+            android:layout_marginStart="15dp"
+            android:layout_marginTop="120dp"
+            android:layout_marginBottom="10dp"
+            android:background="@drawable/button_pending"
+            android:enabled="false"
+            android:text="Creado"
+            android:textAllCaps="false"
+            android:textColor="#FFFFFF" />
+
+    </RelativeLayout>
+
+</com.google.android.material.card.MaterialCardView>

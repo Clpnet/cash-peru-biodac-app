@@ -1,0 +1,21 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="com.acj.client.appprosegur.MainActivity">
+    <item
+        android:id="@+id/opt_pending"
+        android:title="Ordenes Pendientes (43)"
+        />
+    <item
+        android:id="@+id/opt_hit"
+        android:title="Ordenes Hit (17)"
+        />
+    <item
+        android:id="@+id/opt_no_hit"
+        android:title="Ordenes No Hit (2)"
+        />
+    <item
+        android:id="@+id/opt_exit"
+        android:title="Salir"
+        />
+</menu>
