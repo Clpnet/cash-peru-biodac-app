@@ -1,0 +1,43 @@
+name: Veracode SCA
+
+on: 
+  pull_request:
+    branches:
+      - master
+      - develop
+    paths-ignore:
+      - "README.md"
+  workflow_dispatch:
+    
+jobs:
+  veracode-sca-task:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: write 
+      pull-requests: write
+    timeout-minutes: 20
+    name: Scan repository for Issues
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        
+      - name: maven-settings-temporary
+        uses: whelk-io/maven-settings-xml-action@v21
+        with:
+          # Artifactory Cloud basic configuration
+          repositories: '[{ "id": "central", "url": "https://artifactory.prosegur.com/artifactory/libs-release" }]'
+          plugin_repositories: '[{ "id": "central", "url": "https://artifactory.prosegur.com/artifactory/libs-release" }]'
+          servers: '[{ "id": "central", "username": "${{ secrets.ARTIFACTORY_SERVER_CLOUD_USERNAME }}", "password": "${{ secrets.ARTIFACTORY_SERVER_CLOUD_TOKEN }}" }]'
+
+      - name: Run Veracode SCA
+        env:
+          SRCCLR_API_TOKEN: ${{ secrets.VERACODE_SCA_TOKEN_CASH }}
+        #run: curl -sSL https://download.sourceclear.com/ci.sh | sh
+        uses: veracode/veracode-sca@v2.0.65
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          create-issues: true
+          allow-dirty: true
+          recursive: true
