@@ -5,17 +5,17 @@
     <item
         android:id="@+id/opt_pending"
         android:title="Ordenes Pendientes (43)"
-        />
+        app:showAsAction="never" />
     <item
         android:id="@+id/opt_hit"
         android:title="Ordenes Hit (17)"
-        />
+        app:showAsAction="never" />
     <item
         android:id="@+id/opt_no_hit"
         android:title="Ordenes No Hit (2)"
-        />
+        app:showAsAction="never" />
     <item
         android:id="@+id/opt_exit"
         android:title="Salir"
-        />
+        app:showAsAction="never" />
 </menu>

@@ -22,4 +22,11 @@
     <color name="trans_black">#8c000000</color>
     <color name="azul_alert">#2a3342</color>
     <color name="celeste_overlay">#0892f0</color>
+
+    <!-- Otros colores -->
+    <color name="Gray_Cloud">#B6B6B4</color>
+    <color name="Gray">#736F6E</color>
+    <color name="Gray_Light">#D8D8D8</color>
+
+    <color name="yellow_prosegur">#F4D44C</color>
 </resources>

@@ -4,7 +4,6 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:theme="@style/Theme.MaterialComponents"
-    app:cardCornerRadius="8dp"
     app:cardElevation="6dp"
     app:cardUseCompatPadding="true"
     app:cardPreventCornerOverlap="true"
@@ -13,7 +12,7 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="#DCDCDC">
+        android:background="@color/Gray_Light">
 
         <TextView
             android:id="@+id/lblOrderNumber"
@@ -74,7 +73,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="15dp"
             android:layout_marginTop="95dp"
-            android:text="@string/number_intent_msg"
+            android:text="@string/number_intent_desc"
             android:textColor="#000000" />
 
         <TextView
@@ -99,7 +98,7 @@
 
         <Button
             android:id="@+id/btnStatus"
-            android:layout_width="65dp"
+            android:layout_width="100dp"
             android:layout_height="25dp"
             android:layout_marginStart="15dp"
             android:layout_marginTop="120dp"
@@ -107,6 +106,7 @@
             android:background="@drawable/button_pending"
             android:enabled="false"
             android:text="Creado"
+            android:textStyle="bold"
             android:textAllCaps="false"
             android:textColor="#FFFFFF" />
 

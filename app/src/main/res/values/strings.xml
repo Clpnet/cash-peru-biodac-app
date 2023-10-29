@@ -1,11 +1,32 @@
 <resources>
     <string name="app_name">Biodac</string>
+    <string name="app_version">v 1.0</string>
+    <string name="powered_by">© 2023 Powered by ACJ Soluciones</string>
     <string name="action_settings">Settings</string>
 
-    <string name="pending_option_msg">Órdenes Pendientes (%s)</string>
-    <string name="hit_option_msg">Órdenes Hit (%s)</string>
-    <string name="nohit_option_msg">Órdenes No Hit (%s)</string>
+    <!-- LOGIN -->
+    <string name="logo_prosegur_desc">Logo Prosegur</string>
+    <string name="logo_fingerprint_desc">Imagen huella digital</string>
+    <string name="ic_username_desc">Icono caja de texto Usuario</string>
+    <string name="ic_password_desc">Icono caja de texto Password</string>
+    <string name="hint_username_desc">Usuario</string>
+    <string name="hint_password_desc">Contraseña</string>
+    <string name="btn_ingresar_desc">INGRESAR</string>
+    <string name="principal_desc">Autenticación de Usuario</string>
 
-    <string name="number_intent_msg">N° de Intentos (%s)</string>
+    <!-- LOGIN -->
+    <string name="ic_dropdown_desc">Icono caja de texto Usuario</string>
+    <string name="state_pending_desc">PENDIENTES</string>
+    <string name="state_hit_desc">HIT</string>
+    <string name="state_nohit_desc">NO HIT</string>
+    <string name="search_desc">ORDENES PROCESADAS</string>
+
+
+    <string name="pending_option_desc">Órdenes Pendientes (%s)</string>
+    <string name="hit_option_desc">Órdenes Hit (%s)</string>
+    <string name="nohit_option_desc">Órdenes No Hit (%s)</string>
+
+    <string name="number_intent_desc">N° de Intentos (%s)</string>
+
 
 </resources>

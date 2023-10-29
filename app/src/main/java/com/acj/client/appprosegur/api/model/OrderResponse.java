@@ -21,8 +21,5 @@ import lombok.ToString;
 public class OrderResponse {
 
 		private StatusDTO status;
-		private Integer totalPending;
-		private Integer totalHit;
-		private Integer totalNoHit;
 		private List<OrderDTO> orders;
 }

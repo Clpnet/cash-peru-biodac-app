@@ -27,8 +27,11 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.PopupMenu;
 import androidx.appcompat.widget.Toolbar;
 
+import android.text.Editable;
+import android.text.SpannableString;
+import android.text.TextWatcher;
+import android.text.style.ForegroundColorSpan;
 import android.util.Log;
-import android.view.KeyEvent;
 import android.view.MenuItem;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
@@ -39,6 +42,7 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 import cn.pedant.SweetAlert.SweetAlertDialog;
@@ -55,6 +59,7 @@ public class MainActivity extends AppCompatActivity {
 
 		private ImageView menuIcon;
 
+		private TextView txtCurrentState;
 		private EditText etxSearchBox;
 
 		private PopupMenu orderMenu;
@@ -79,10 +84,11 @@ public class MainActivity extends AppCompatActivity {
 				Toolbar toolbar = findViewById(R.id.toolbar);
 
 				setSupportActionBar(toolbar);
-				getSupportActionBar().setDisplayShowTitleEnabled(false);
+				Objects.requireNonNull(getSupportActionBar()).setDisplayShowTitleEnabled(false);
 
 				menuIcon = toolbar.findViewById(R.id.overflow_icon);
 
+				txtCurrentState = findViewById(R.id.txtOrderStates);
 				etxSearchBox = findViewById(R.id.searchEditText);
 
 				context = this;
@@ -107,33 +113,36 @@ public class MainActivity extends AppCompatActivity {
 								orderMenu.setOnMenuItemClickListener(this::optionItemSelected);
 						}
 
-						pendingOption.setTitle(String.format(getString(R.string.pending_option_msg),
+						pendingOption.setTitle(String.format(getString(R.string.pending_option_desc),
 								SessionConfig.getInstance().getTotalPending().toString()));
-						hitOption.setTitle(String.format(getString(R.string.hit_option_msg),
+						hitOption.setTitle(String.format(getString(R.string.hit_option_desc),
 								SessionConfig.getInstance().getTotalHit().toString()));
-						noHitOption.setTitle(String.format(getString(R.string.nohit_option_msg),
+						noHitOption.setTitle(String.format(getString(R.string.nohit_option_desc),
 								SessionConfig.getInstance().getTotalNoHit().toString()));
 
 						orderMenu.show();
 				});
 
 				// Agregar filtro de caja de busqueda
-				etxSearchBox.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+				etxSearchBox.addTextChangedListener(new TextWatcher() {
 						@Override
-						public boolean onEditorAction(TextView textView, int actionId, KeyEvent event) {
+						public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
 
-								if (EditorInfo.IME_ACTION_DONE == actionId) {
+						}
 
-										// Cerrando teclado virtual
-										InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-										imm.hideSoftInputFromWindow(etxSearchBox.getWindowToken(), 0);
+						@Override
+						public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
 
-										// Refrescando la lista
-										updateVisibleList(null, textView.getText().toString());
+						}
 
-								}
+						@Override
+						public void afterTextChanged(Editable editable) {
+								// Cerrando teclado virtual
+								/* InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+								imm.hideSoftInputFromWindow(etxSearchBox.getWindowToken(), 0);*/
 
-								return false;
+								// Refrescando la lista
+								updateVisibleContent(null, editable.toString(), Boolean.TRUE);
 						}
 				});
 
@@ -192,34 +201,66 @@ public class MainActivity extends AppCompatActivity {
 		}
 
 		private void updateOrderData(OrderResponse response) {
-				SessionConfig.getInstance().setOrderResponse(response);
-				SessionConfig.getInstance().setVisibleList(response.getOrders());
+				SessionConfig session = SessionConfig.getInstance();
 
-				SessionConfig.getInstance().setTotalPending(response.getTotalPending());
-				SessionConfig.getInstance().setTotalHit(response.getTotalHit());
-				SessionConfig.getInstance().setTotalNoHit(response.getTotalNoHit());
+				session.setOrderResponse(response);
 
+				if (Objects.nonNull(session.getLastSelectedOption())) {
+						updateVisibleContent(session.getLastSelectedOption(), null, Boolean.FALSE);
+				} else {
+						session.setVisibleList(response.getOrders());
+				}
+
+				int totalPending = 0;
+				int totalHit = 0;
+				int totalNoHit = 0;
+
+				for (OrderDTO orderDTO : response.getOrders()) {
+						switch (orderDTO.getOrderState()) {
+								case PENDING:
+										++totalPending;
+										break;
+								case HIT:
+										++totalHit;
+										break;
+								case NO_HIT:
+										++totalNoHit;
+										break;
+						}
+				}
+
+				session.setTotalPending(totalPending);
+				session.setTotalHit(totalHit);
+				session.setTotalNoHit(totalNoHit);
 		}
 
-		private void updateVisibleList(String code, String orderNumber) {
+		private void updateVisibleContent(OrderStateEnum stateEnum, String orderNumber, Boolean refresh) {
 				List<OrderDTO> allOrders = SessionConfig.getInstance().getOrderResponse().getOrders();
 				List<OrderDTO> resultList = new ArrayList<>();
+				AtomicReference<OrderStateEnum> currentState = new AtomicReference<>(SessionConfig.getInstance().getLastSelectedOption());
 
-				if (Objects.nonNull(code)) {
+				if (Objects.nonNull(stateEnum)) {
 						resultList = allOrders.stream()
-								.filter(it -> code.equals(it.getOrderState().getCode()))
+								.filter(it -> stateEnum.getCode().equals(it.getOrderState().getCode()))
 								.collect(Collectors.toList());
+
+						currentState.set(stateEnum);
 				} else if (Objects.nonNull(orderNumber)) {
 						resultList = (orderNumber.length() > 0)
 								? allOrders.stream()
 								.filter(it -> it.getOrderNumber().contains(orderNumber))
 								.collect(Collectors.toList()) : allOrders;
+
+						currentState.set((!resultList.isEmpty()) ? resultList.get(0).getOrderState() : OrderStateEnum.PENDING);
 				}
 
-				//SessionConfig.getInstance().setVisibleList( (resultList.isEmpty()) ? allOrders : resultList );
+				txtCurrentState.setText((OrderStateEnum.Constants.PENDING_CODE.equals(currentState.get().getCode()))
+						? getString(R.string.state_pending_desc)
+						: currentState.get().getDescription());
+
 				SessionConfig.getInstance().setVisibleList(resultList);
 
-				refreshContent();
+				if (refresh) refreshContent();
 		}
 
 		public boolean optionItemSelected(MenuItem item) {
@@ -227,13 +268,16 @@ public class MainActivity extends AppCompatActivity {
 
 				switch (id) {
 						case R.id.opt_pending:
-								updateVisibleList(OrderStateEnum.Constants.PENDING_CODE, null);
+								SessionConfig.getInstance().setLastSelectedOption(OrderStateEnum.PENDING);
+								updateVisibleContent(OrderStateEnum.PENDING,null, Boolean.TRUE);
 								break;
 						case R.id.opt_hit:
-								updateVisibleList(OrderStateEnum.Constants.HIT_CODE, null);
+								SessionConfig.getInstance().setLastSelectedOption(OrderStateEnum.HIT);
+								updateVisibleContent(OrderStateEnum.HIT, null, Boolean.TRUE);
 								break;
 						case R.id.opt_no_hit:
-								updateVisibleList(OrderStateEnum.Constants.NO_HIT_CODE, null);
+								SessionConfig.getInstance().setLastSelectedOption(OrderStateEnum.NO_HIT);
+								updateVisibleContent(OrderStateEnum.NO_HIT, null, Boolean.TRUE);
 								break;
 						case R.id.opt_exit:
 								Intent intentLogin = new Intent(this, LoginActivity.class);

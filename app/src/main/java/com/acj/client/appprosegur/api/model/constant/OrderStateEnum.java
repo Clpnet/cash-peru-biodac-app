@@ -7,9 +7,9 @@ import lombok.Getter;
 @AllArgsConstructor
 public enum OrderStateEnum {
 
-		PENDING(Constants.PENDING_CODE, "Creado"),
-		HIT(Constants.HIT_CODE, "Hit"),
-		NO_HIT(Constants.NO_HIT_CODE, "No Hit")
+		PENDING(Constants.PENDING_CODE, "CREADO"),
+		HIT(Constants.HIT_CODE, "HIT"),
+		NO_HIT(Constants.NO_HIT_CODE, "NO HIT")
 		;
 
 		private final String code;

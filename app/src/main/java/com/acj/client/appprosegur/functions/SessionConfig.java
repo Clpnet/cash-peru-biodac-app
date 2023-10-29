@@ -3,6 +3,7 @@ package com.acj.client.appprosegur.functions;
 import android.util.Log;
 
 import com.acj.client.appprosegur.api.model.OrderResponse;
+import com.acj.client.appprosegur.api.model.constant.OrderStateEnum;
 import com.acj.client.appprosegur.api.model.dto.OrderDTO;
 
 import java.util.List;
@@ -29,6 +30,7 @@ public class SessionConfig {
     private Integer tipoHuellero = null;
     private Integer tipoServicio = null;
     private Integer tipoBiometria = null;
+    private OrderStateEnum lastSelectedOption = null;
 
     private String tokenAuth = "";
     private Integer idEmpresa = null;

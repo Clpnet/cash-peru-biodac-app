@@ -8,6 +8,7 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.acj.client.appprosegur.R;
@@ -48,13 +49,16 @@ public class OrderCustomAdapter extends RecyclerView.Adapter<OrderCustomAdapter.
 				holder.txtCardType.setText(orden.getCardType());
 				holder.txtDocumentNumber.setText(orden.getDocumentNumber().substring(0, 4) + "****");
 				holder.txtNumberIntent.setText((orden.getNumberIntent() > 0)
-						? String.format(context.getString(R.string.number_intent_msg), orden.getNumberIntent().toString())
+						? String.format(context.getString(R.string.number_intent_desc), orden.getNumberIntent().toString())
 						: "");
 				holder.txtFirstDate.setText(orden.getFirstDate());
 				holder.txtSecondDate.setText(orden.getSecondDate());
 
-				holder.btnEstado.setBackgroundResource(getDrawableByState(orden.getOrderState().getCode()));
+				holder.btnEstado.setBackgroundResource(getDrawableByState(orden.getOrderState()));
 				holder.btnEstado.setText(orden.getOrderState().getDescription());
+
+				holder.btnEstado.setTextColor((OrderStateEnum.Constants.PENDING_CODE.equals(orden.getOrderState().getCode()))
+						? ContextCompat.getColor(context, R.color.black) : ContextCompat.getColor(context, R.color.white));
 
 				holder.cardview.setOnClickListener(view -> listener.onItemClick(Integer.parseInt(orden.getDocumentNumber())));
 		}
@@ -90,13 +94,15 @@ public class OrderCustomAdapter extends RecyclerView.Adapter<OrderCustomAdapter.
 				void onItemClick(int position);
 		}
 
-		private int getDrawableByState(String code) {
-			if (OrderStateEnum.Constants.PENDING_CODE.equals(code)) {
-					return R.drawable.button_pending;
-			} else if (OrderStateEnum.Constants.HIT_CODE.equals(code)) {
-					return R.drawable.button_hit;
-			} else {
-					return R.drawable.button_no_hit;
-			}
+		private int getDrawableByState(OrderStateEnum stateEnum) {
+				switch (stateEnum) {
+						case HIT:
+								return R.drawable.button_hit;
+						case NO_HIT:
+								return R.drawable.button_no_hit;
+						default:
+								return R.drawable.button_pending;
+				}
 		}
+
 }
