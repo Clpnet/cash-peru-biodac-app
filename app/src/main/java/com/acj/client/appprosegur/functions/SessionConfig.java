@@ -42,6 +42,7 @@ public class SessionConfig {
 
     // Eikon Globals
     private boolean allowedPermission = false;
+    private boolean isReaderEnabled = false;
 
     public static synchronized SessionConfig getInstance() {
         if (null == GLOBAL) {

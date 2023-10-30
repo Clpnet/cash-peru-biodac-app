@@ -1,11 +1,7 @@
 package com.acj.client.appprosegur.views;
 
-import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Color;
-import android.hardware.usb.UsbDevice;
-import android.hardware.usb.UsbManager;
 import android.os.Bundle;
 
 import com.acj.client.appprosegur.R;
@@ -16,10 +12,8 @@ import com.acj.client.appprosegur.api.model.constant.OrderStateEnum;
 import com.acj.client.appprosegur.api.model.constant.StatusResponseEnum;
 import com.acj.client.appprosegur.api.model.dto.OrderDTO;
 import com.acj.client.appprosegur.databinding.ActivityMainBinding;
-import com.acj.client.appprosegur.functions.EikonManager;
 import com.acj.client.appprosegur.functions.SessionConfig;
 import com.acj.client.appprosegur.views.login.LoginActivity;
-import com.digitalpersona.uareu.ReaderCollection;
 import com.google.android.material.appbar.AppBarLayout;
 
 import androidx.annotation.NonNull;
@@ -42,7 +36,6 @@ import java.util.Objects;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
-import cn.pedant.SweetAlert.SweetAlertDialog;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -66,7 +59,7 @@ public class MainActivity extends AppCompatActivity {
 
 		private Context context;
 
-		private EikonManager eikonManager;
+		private Boolean isDataLoaded;
 
 		@Override
 		protected void onCreate(Bundle savedInstanceState) {
@@ -89,7 +82,6 @@ public class MainActivity extends AppCompatActivity {
 				etxSearchBox = findViewById(R.id.searchEditText);
 
 				context = this;
-				eikonManager = new EikonManager(context);
 
 				// Render content on fragment
 				OrderFragment orderFragment = new OrderFragment(context, new ArrayList<>());
@@ -110,14 +102,16 @@ public class MainActivity extends AppCompatActivity {
 								orderMenu.setOnMenuItemClickListener(this::optionItemSelected);
 						}
 
-						pendingOption.setTitle(String.format(getString(R.string.pending_option_desc),
-								SessionConfig.getInstance().getTotalPending().toString()));
-						hitOption.setTitle(String.format(getString(R.string.hit_option_desc),
-								SessionConfig.getInstance().getTotalHit().toString()));
-						noHitOption.setTitle(String.format(getString(R.string.nohit_option_desc),
-								SessionConfig.getInstance().getTotalNoHit().toString()));
+						if (isDataLoaded) {
+								pendingOption.setTitle(String.format(getString(R.string.pending_option_desc),
+										SessionConfig.getInstance().getTotalPending().toString()));
+								hitOption.setTitle(String.format(getString(R.string.hit_option_desc),
+										SessionConfig.getInstance().getTotalHit().toString()));
+								noHitOption.setTitle(String.format(getString(R.string.nohit_option_desc),
+										SessionConfig.getInstance().getTotalNoHit().toString()));
 
-						orderMenu.show();
+								orderMenu.show();
+						}
 				});
 
 				// Agregar filtro de caja de busqueda
@@ -143,9 +137,6 @@ public class MainActivity extends AppCompatActivity {
 						}
 				});
 
-				//eikonManager.requestPermission(mainUsbReceiver, this);
-				//SERGIO SICCHA -> SOLICITAR PERMISOS HUELLERO
-
 		}
 
 		@Override
@@ -164,6 +155,8 @@ public class MainActivity extends AppCompatActivity {
 						public void onResponse(@NonNull Call<OrderResponse> call, @NonNull Response<OrderResponse> response) {
 								if (response.isSuccessful() && response.body().getStatus().getCode().equals(StatusResponseEnum.SUCCESS.getCode())) {
 
+										Log.i(LOG_TAG, "Actualizado lista de ordenes");
+
 										updateOrderData(response.body());
 										refreshContent();
 
@@ -179,6 +172,12 @@ public class MainActivity extends AppCompatActivity {
 						}
 				});
 
+		}
+
+		@Override
+		protected void onStop() {
+				super.onStop();
+				isDataLoaded = Boolean.FALSE;
 		}
 
 		private void refreshContent() {
@@ -219,9 +218,13 @@ public class MainActivity extends AppCompatActivity {
 						}
 				}
 
+				Log.i(LOG_TAG, "Total de ordenes P|H|NH " + totalPending + "|" + totalHit + "|" + totalNoHit);
+
 				session.setTotalPending(totalPending);
 				session.setTotalHit(totalHit);
 				session.setTotalNoHit(totalNoHit);
+
+				isDataLoaded = Boolean.TRUE;
 		}
 
 		private void updateVisibleContent(OrderStateEnum stateEnum, String orderNumber, Boolean refresh) {
@@ -258,14 +261,17 @@ public class MainActivity extends AppCompatActivity {
 
 				switch (id) {
 						case R.id.opt_pending:
+								Log.i(LOG_TAG, "Filtrando solo ordenes con estado " + OrderStateEnum.PENDING);
 								SessionConfig.getInstance().setLastSelectedOption(OrderStateEnum.PENDING);
 								updateVisibleContent(OrderStateEnum.PENDING,null, Boolean.TRUE);
 								break;
 						case R.id.opt_hit:
+								Log.i(LOG_TAG, "Filtrando solo ordenes con estado " + OrderStateEnum.HIT);
 								SessionConfig.getInstance().setLastSelectedOption(OrderStateEnum.HIT);
 								updateVisibleContent(OrderStateEnum.HIT, null, Boolean.TRUE);
 								break;
 						case R.id.opt_no_hit:
+								Log.i(LOG_TAG, "Filtrando solo ordenes con estado " + OrderStateEnum.NO_HIT);
 								SessionConfig.getInstance().setLastSelectedOption(OrderStateEnum.NO_HIT);
 								updateVisibleContent(OrderStateEnum.NO_HIT, null, Boolean.TRUE);
 								break;
@@ -278,67 +284,5 @@ public class MainActivity extends AppCompatActivity {
 
 				return super.onOptionsItemSelected(item);
 		}
-
-		private Boolean deteccionHuellero() {
-				try {
-						ReaderCollection readers = eikonManager.getReaders();
-
-						if (readers.size() >= 1) {
-								eikonManager.activateReader();
-								eikonManager.getSerialNumber();
-								return Boolean.TRUE;
-						} else {
-								Log.i("VerificarFDP Huellero", "No Hay Huellero");
-								SweetAlertDialog a = new SweetAlertDialog(context, SweetAlertDialog.ERROR_TYPE);
-								a.setCancelable(false);
-								a.setCanceledOnTouchOutside(false);
-								a.setTitleText("EIKON Fingerprint SDK");
-								a.setConfirmText("OK");
-								a.setConfirmButtonTextColor(Color.WHITE);
-								a.setConfirmButtonBackgroundColor(Color.RED);
-								a.setContentText("¡La inicialización del scanner" +
-										" de huellas digitales ha fallado!" + "\n" +
-										"Conecte el scanner a su dispositivo");
-								a.setConfirmClickListener(sDialog -> {
-										sDialog.dismiss();
-
-										Intent intent = this.getIntent();
-										intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK
-												| Intent.FLAG_ACTIVITY_NO_ANIMATION);
-										this.overridePendingTransition(0, 0);
-										this.finish();
-
-										this.overridePendingTransition(0, 0);
-										startActivity(intent);
-								});
-								a.show();
-								return Boolean.FALSE;
-						}
-
-				} catch (Exception ex) {
-						ex.printStackTrace();
-				}
-				return Boolean.FALSE;
-		}
-
-		// SERGIO SICCHA -> VALIDAR SI SE PUEDE MOVER A LA ACTIVITY DE CAPTURA
-		private final BroadcastReceiver mainUsbReceiver = new BroadcastReceiver() {
-				public void onReceive(Context context, Intent intent) {
-						Log.i("SERGIO  eikon ", "-------broadcaster Fragment --------");
-						String action = intent.getAction();
-						if (EikonManager.ACTION_USB_PERMISSION.equals(action)) {
-								synchronized (this) {
-										UsbDevice device = (UsbDevice) intent.getParcelableExtra(UsbManager.EXTRA_DEVICE);
-										if (intent.getBooleanExtra(UsbManager.EXTRA_PERMISSION_GRANTED, false)) {
-												if (device != null) {
-														SessionConfig.getInstance().setAllowedPermission(true);
-														//huellero = deteccionHuellero(); SERGIO SICCHA -> REVISAR
-												}
-										}
-										context.unregisterReceiver(mainUsbReceiver);
-								}
-						}
-				}
-		};
 
 }

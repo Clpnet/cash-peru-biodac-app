@@ -13,13 +13,9 @@ import com.acj.client.appprosegur.databinding.ActivityLoginBinding;
 
 public class LoginActivity extends AppCompatActivity {
 
-    private static final int PERMISSION_FINE_LOCATION = 99;
-
     private Button btn_login;
 
     private ActivityLoginBinding loginBinding;
-
-    private int intentoHome = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,17 +25,19 @@ public class LoginActivity extends AppCompatActivity {
         btn_login = findViewById(R.id.btn_login);
 
         btn_login.setOnClickListener(view -> {
+            btn_login.setClickable(Boolean.FALSE);
+            btn_login.setEnabled(Boolean.FALSE);
+
             Intent intent = new Intent(this, MainActivity.class);
             startActivity(intent);
+
+            finish();
         });
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-
-        intentoHome = 0;
-
     }
 
     @Override

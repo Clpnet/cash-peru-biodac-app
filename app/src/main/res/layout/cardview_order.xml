@@ -7,12 +7,14 @@
     app:cardElevation="6dp"
     app:cardUseCompatPadding="true"
     app:cardPreventCornerOverlap="true"
+    android:clickable="false"
     android:id="@+id/cdvOrder">
 
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/Gray_Light">
+        android:background="@drawable/card_layout"
+        android:padding="5dp">
 
         <TextView
             android:id="@+id/lblOrderNumber"

@@ -107,23 +107,16 @@ public class EikonManager {
             a.setConfirmClickListener(sDialog -> {
                 sDialog.dismiss();
 
-                Intent intent = callerActivity.getIntent();
+                callerActivity.finish();
+
+                /*Intent intent = callerActivity.getIntent();
                 intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK
                         | Intent.FLAG_ACTIVITY_NO_ANIMATION);
                 callerActivity.overridePendingTransition(0, 0);
                 callerActivity.finish();
 
                 callerActivity.overridePendingTransition(0, 0);
-                callerActivity.startActivity(intent);
-
-                /* Intent intent = this.getIntent();
-                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK
-                        | Intent.FLAG_ACTIVITY_NO_ANIMATION);
-                this.overridePendingTransition(0, 0);
-                this.finish();
-
-                this.overridePendingTransition(0, 0);
-                startActivity(intent); */
+                callerActivity.startActivity(intent);*/
 
                 SessionConfig.getInstance().setAllowedPermission(false);
             });
@@ -142,6 +135,8 @@ public class EikonManager {
             IntentFilter filter = new IntentFilter(ACTION_USB_PERMISSION);
             context.registerReceiver(usbPermissionReceiver, filter);
             if (!readerCollection.isEmpty()) {
+                Log.i(LOG_TAG, "Enabling reader");
+
                 deviceName = readerCollection.get(0).GetDescription().name;
                 currentReader = getReader(deviceName);
 
@@ -184,7 +179,13 @@ public class EikonManager {
             captureResult = currentReader.Capture(Fid.Format.ANSI_381_2004, Globals.DefaultImageProcessing, readerResolutionDPI, -1);
 
             if (Objects.nonNull(captureResult.image)) {
+
+                Log.i(LOG_TAG, "FINGERPRINT CAPTURE WAS SUCCESSFULL");
+
                 currentReader.CancelCapture();
+
+                Log.i(LOG_TAG, "STOPPED READER CAPTURE");
+
                 Fmd captureFmd = captureEngine.CreateFmd(captureResult.image, Fmd.Format.ANSI_378_2004);
 
                 Log.e(LOG_TAG, "Creating capture FMD: [" + captureFmd.toString() + "]");

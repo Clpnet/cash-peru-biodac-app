@@ -2,6 +2,8 @@ package com.acj.client.appprosegur.api.model.dto;
 
 import com.acj.client.appprosegur.api.model.constant.OrderStateEnum;
 
+import java.io.Serializable;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -15,7 +17,7 @@ import lombok.ToString;
 @NoArgsConstructor
 @Builder
 @ToString
-public class OrderDTO {
+public class OrderDTO implements Serializable {
 
     private String orderNumber;
     private String cardType;

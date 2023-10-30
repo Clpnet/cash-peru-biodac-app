@@ -125,7 +125,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="3dp"
-                        android:text="@string/txt_order_number_desc"
+                        android:text="@string/txt_doc_number_desc"
                         android:textColor="@color/black"
                         android:textSize="11sp"
                         android:textStyle="bold"
@@ -165,7 +165,7 @@
                         android:paddingBottom="8dp">
 
                         <TextView
-                            android:id="@+id/txtHuellaIzq"
+                            android:id="@+id/lblHuellaIzq"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="10dp"
@@ -174,7 +174,7 @@
                             android:textStyle="bold" />
 
                         <ImageView
-                            android:id="@+id/imgManoIzquierda"
+                            android:id="@+id/imgManoIzq"
                             android:layout_width="100dp"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="10dp"
@@ -197,7 +197,7 @@
                         android:paddingBottom="8dp">
 
                         <TextView
-                            android:id="@+id/txtHuellaDer"
+                            android:id="@+id/lblHuellaDer"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="10dp"
@@ -206,7 +206,7 @@
                             android:textStyle="bold" />
 
                         <ImageView
-                            android:id="@+id/imgManoDerecha"
+                            android:id="@+id/imgManoDer"
                             android:layout_width="100dp"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="10dp"
@@ -230,7 +230,7 @@
                     <Button
                         android:id="@+id/btnCapturaIzq"
                         android:layout_width="95dp"
-                        android:layout_height="20dp"
+                        android:layout_height="30dp"
                         android:layout_marginEnd="27dp"
                         android:background="@drawable/captura_button_yellow"
                         android:text="@string/btn_captura_desc"
@@ -243,7 +243,7 @@
                     <Button
                         android:id="@+id/btnCapturaDer"
                         android:layout_width="95dp"
-                        android:layout_height="20dp"
+                        android:layout_height="30dp"
                         android:layout_marginStart="30dp"
                         android:background="@drawable/captura_button_yellow"
                         android:text="@string/btn_captura_desc"
@@ -280,7 +280,7 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/lytCaptura"
-                android:visibility="gone"
+
                 tools:ignore="TextSizeCheck">
 
                 <TextView
@@ -307,7 +307,7 @@
                     app:layout_constraintTop_toTopOf="@+id/lytResultados" />
 
                 <TextView
-                    android:id="@+id/lblRResultCode"
+                    android:id="@+id/txtRResultCode"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/lbl_result_code_desc"
@@ -315,7 +315,7 @@
                     android:textSize="11sp"
                     android:textStyle="bold"
                     app:layout_constraintStart_toStartOf="@+id/lytResultados"
-                    app:layout_constraintTop_toBottomOf="@+id/txtRDocumentNumber" />
+                    app:layout_constraintTop_toBottomOf="@+id/lblRDocumentNumber" />
 
                 <TextView
                     android:id="@+id/txtRResultDesc"
@@ -326,7 +326,7 @@
                     android:textColor="@color/black"
                     android:textSize="11sp"
                     android:textStyle="bold"
-                    app:layout_constraintStart_toEndOf="@+id/lblRResultCode"
+                    app:layout_constraintStart_toEndOf="@+id/txtRResultCode"
                     app:layout_constraintTop_toBottomOf="@+id/txtRDocumentNumber" />
 
                 <TextView
@@ -339,10 +339,10 @@
                     android:textSize="11sp"
                     android:textStyle="bold"
                     app:layout_constraintStart_toStartOf="@+id/lytResultados"
-                    app:layout_constraintTop_toBottomOf="@+id/lblRResultCode" />
+                    app:layout_constraintTop_toBottomOf="@+id/txtRResultCode" />
 
                 <TextView
-                    android:id="@+id/txtNombres"
+                    android:id="@+id/txtRNombres"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="3dp"
@@ -366,7 +366,7 @@
                     app:layout_constraintTop_toBottomOf="@+id/lblNombres" />
 
                 <TextView
-                    android:id="@+id/txtApPaterno"
+                    android:id="@+id/txtRApPaterno"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="3dp"
@@ -375,7 +375,7 @@
                     android:textSize="11sp"
                     android:textStyle="bold"
                     app:layout_constraintStart_toEndOf="@+id/lblApPaterno"
-                    app:layout_constraintTop_toBottomOf="@+id/txtNombres" />
+                    app:layout_constraintTop_toBottomOf="@+id/txtRNombres" />
 
                 <TextView
                     android:id="@+id/lblApMaterno"
@@ -389,7 +389,7 @@
                     app:layout_constraintTop_toBottomOf="@+id/lblApPaterno" />
 
                 <TextView
-                    android:id="@+id/txtApMaterno"
+                    android:id="@+id/txtRApMaterno"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="3dp"
@@ -397,8 +397,8 @@
                     android:textColor="@color/black"
                     android:textSize="11sp"
                     android:textStyle="bold"
-                    app:layout_constraintStart_toEndOf="@+id/lblApPaterno"
-                    app:layout_constraintTop_toBottomOf="@+id/txtApPaterno" />
+                    app:layout_constraintStart_toEndOf="@+id/lblApMaterno"
+                    app:layout_constraintTop_toBottomOf="@+id/txtRApPaterno" />
 
                 <TextView
                     android:id="@+id/lblIdTransaccion"
@@ -412,7 +412,7 @@
                     app:layout_constraintTop_toBottomOf="@+id/lblApMaterno" />
 
                 <TextView
-                    android:id="@+id/txtIdTransaccion"
+                    android:id="@+id/txtRIdTransaccion"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="3dp"
@@ -420,11 +420,11 @@
                     android:textColor="@color/black"
                     android:textSize="11sp"
                     android:textStyle="bold"
-                    app:layout_constraintStart_toEndOf="@+id/lblApPaterno"
-                    app:layout_constraintTop_toBottomOf="@+id/txtApMaterno" />
+                    app:layout_constraintStart_toEndOf="@+id/lblIdTransaccion"
+                    app:layout_constraintTop_toBottomOf="@+id/txtRApMaterno" />
 
                 <TextView
-                    android:id="@+id/txtErrorDesc"
+                    android:id="@+id/txtRErrorDesc"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
@@ -432,13 +432,14 @@
                     android:textColor="@color/bg_danger"
                     android:textSize="11sp"
                     android:textStyle="bold"
+                    android:visibility="gone"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/txtIdTransaccion" />
+                    app:layout_constraintTop_toBottomOf="@+id/txtRIdTransaccion" />
 
                 <Button
                     android:id="@+id/btnOtraConsulta"
                     android:layout_width="165dp"
-                    android:layout_height="20dp"
+                    android:layout_height="30dp"
                     android:layout_marginTop="13dp"
                     android:background="@drawable/captura_button_yellow"
                     android:text="@string/btn_otra_consulta_desc"
@@ -448,7 +449,7 @@
                     android:textStyle="bold"
                     app:layout_constraintEnd_toEndOf="@+id/lytResultados"
                     app:layout_constraintStart_toStartOf="@+id/lytResultados"
-                    app:layout_constraintTop_toBottomOf="@+id/txtErrorDesc"
+                    app:layout_constraintTop_toBottomOf="@+id/txtRErrorDesc"
                     tools:ignore="ButtonStyle,TouchTargetSizeCheck,TextSizeCheck,DuplicateSpeakableTextCheck" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>

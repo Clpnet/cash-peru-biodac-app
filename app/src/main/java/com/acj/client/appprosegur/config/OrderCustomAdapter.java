@@ -60,14 +60,13 @@ public class OrderCustomAdapter extends RecyclerView.Adapter<OrderCustomAdapter.
 				holder.btnEstado.setTextColor((OrderStateEnum.Constants.PENDING_CODE.equals(orden.getOrderState().getCode()))
 						? ContextCompat.getColor(context, R.color.black) : ContextCompat.getColor(context, R.color.white));
 
-				holder.cardview.setOnClickListener(view -> listener.onItemClick(Integer.parseInt(orden.getDocumentNumber())));
+				holder.cardview.setOnClickListener(view -> listener.onItemClick(position));
 		}
 
 		@Override
 		public int getItemCount() {
 				return orderDTO.size();
 		}
-
 
 		public static class ViewHolder extends RecyclerView.ViewHolder {
 
