@@ -1,4 +1,4 @@
-package com.acj.client.appprosegur;
+package com.acj.client.appprosegur.views;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -8,6 +8,7 @@ import android.hardware.usb.UsbDevice;
 import android.hardware.usb.UsbManager;
 import android.os.Bundle;
 
+import com.acj.client.appprosegur.R;
 import com.acj.client.appprosegur.api.ApiService.OrderService;
 import com.acj.client.appprosegur.api.ApiUtils;
 import com.acj.client.appprosegur.api.model.OrderResponse;
@@ -17,7 +18,7 @@ import com.acj.client.appprosegur.api.model.dto.OrderDTO;
 import com.acj.client.appprosegur.databinding.ActivityMainBinding;
 import com.acj.client.appprosegur.functions.EikonManager;
 import com.acj.client.appprosegur.functions.SessionConfig;
-import com.acj.client.appprosegur.login.LoginActivity;
+import com.acj.client.appprosegur.views.login.LoginActivity;
 import com.digitalpersona.uareu.ReaderCollection;
 import com.google.android.material.appbar.AppBarLayout;
 
@@ -28,13 +29,9 @@ import androidx.appcompat.widget.PopupMenu;
 import androidx.appcompat.widget.Toolbar;
 
 import android.text.Editable;
-import android.text.SpannableString;
 import android.text.TextWatcher;
-import android.text.style.ForegroundColorSpan;
 import android.util.Log;
 import android.view.MenuItem;
-import android.view.inputmethod.EditorInfo;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;

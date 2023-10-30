@@ -14,12 +14,40 @@
     <string name="btn_ingresar_desc">INGRESAR</string>
     <string name="principal_desc">Autenticación de Usuario</string>
 
-    <!-- LOGIN -->
+    <!-- MAIN -->
     <string name="ic_dropdown_desc">Icono caja de texto Usuario</string>
     <string name="state_pending_desc">PENDIENTES</string>
     <string name="state_hit_desc">HIT</string>
     <string name="state_nohit_desc">NO HIT</string>
     <string name="search_desc">ORDENES PROCESADAS</string>
+
+    <!-- CAPTURA -->
+    <string name="title_captura">CAPTURA DE HUELLA</string>
+    <string name="lbl_order_number_desc">Nro de Orden:</string>
+    <string name="txt_order_number_desc">123456789012345</string>
+    <string name="txt_order_type_desc">TC</string>
+    <string name="txt_card_desc">INTERBANK</string>
+    <string name="lbl_doc_number_desc">N° de Documento:</string>
+    <string name="txt_doc_number_desc">1234****</string>
+    <string name="txt_date_desc">01/02/2023 06:05:01</string>
+    <string name="lbl_result_document_number_desc">DNI:</string>
+    <string name="txt_result_document_number_desc">08765432</string>
+    <string name="lbl_result_code_desc">70006:</string>
+    <string name="txt_result_desc">HIT - Validación Correcta</string>
+    <string name="lbl_nombres_desc">Nombres:</string>
+    <string name="txt_nombres_desc">JOSÉ MANUEL</string>
+    <string name="lbl_ap_paterno_desc">Apellido Paterno:</string>
+    <string name="txt_ap_paterno_desc">PEREZ</string>
+    <string name="lbl_ap_materno_desc">Apellido Materno:</string>
+    <string name="txt_ap_materno_desc">CASTRO</string>
+    <string name="lbl_id_transaccion_desc">Id Transacción:</string>
+    <string name="txt_id_transaccion_desc">12345</string>
+    <string name="huella_izq_default_desc">Pulgar Izquierdo</string>
+    <string name="huella_der_default_desc">Pulgar Derecho</string>
+    <string name="img_huella_izq_desc">Imagen de la huella izquierda</string>
+    <string name="img_huella_der_desc">Imagen de la huella derecha</string>
+    <string name="btn_captura_desc">CAPTURA</string>
+    <string name="btn_otra_consulta_desc">OTRA CONSULTA</string>
 
 
     <string name="pending_option_desc">Órdenes Pendientes (%s)</string>

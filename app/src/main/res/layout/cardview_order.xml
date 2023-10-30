@@ -33,6 +33,7 @@
             android:textColor="#000000" />
 
         <TextView
+            android:id="@+id/txtOrderType"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="15dp"
@@ -41,7 +42,7 @@
             android:textColor="#000000" />
 
         <TextView
-            android:id="@+id/txtCardType"
+            android:id="@+id/txtCardDesc"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="15dp"

@@ -1,36 +1,15 @@
-package com.acj.client.appprosegur.login;
+package com.acj.client.appprosegur.views.login;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.Manifest;
-import android.annotation.SuppressLint;
-import android.app.PendingIntent;
-import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
-import android.content.pm.PackageManager;
-import android.graphics.Color;
-import android.hardware.usb.UsbDevice;
-import android.hardware.usb.UsbManager;
-import android.location.LocationManager;
 import android.os.Bundle;
-import android.util.Log;
-import android.view.WindowManager;
 import android.widget.Button;
 
-import com.acj.client.appprosegur.MainActivity;
+import com.acj.client.appprosegur.views.MainActivity;
 import com.acj.client.appprosegur.R;
 import com.acj.client.appprosegur.databinding.ActivityLoginBinding;
-import com.acj.client.appprosegur.functions.EikonGlobal;
-import com.acj.client.appprosegur.functions.Globals;
-import com.digitalpersona.uareu.*;
-
-import java.util.HashMap;
-import java.util.Iterator;
-
-import cn.pedant.SweetAlert.SweetAlertDialog;
 
 public class LoginActivity extends AppCompatActivity {
 

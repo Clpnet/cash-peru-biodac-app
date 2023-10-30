@@ -1,15 +1,12 @@
-package com.acj.client.appprosegur;
+package com.acj.client.appprosegur.views.captura;
 
-import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
-import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -17,29 +14,22 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.acj.client.appprosegur.views.MainActivity;
+import com.acj.client.appprosegur.R;
 import com.acj.client.appprosegur.api.ApiService.DatoBiometricoService;
-import com.acj.client.appprosegur.api.ApiService.MejoresHuellasService;
-import com.acj.client.appprosegur.api.ApiService.VerificarIdentidadReniecService;
 import com.acj.client.appprosegur.api.ApiUtils;
 import com.acj.client.appprosegur.functions.EikonGlobal;
 import com.acj.client.appprosegur.functions.SessionConfig;
 import com.acj.client.appprosegur.functions.Globals;
 import com.acj.client.appprosegur.functions.Util;
 import com.acj.client.appprosegur.model.ApiDatos;
-import com.acj.client.appprosegur.api.model.dto.OrderDTO;
 import com.acj.client.appprosegur.model.reniec.DataBiometrica;
 import com.acj.client.appprosegur.model.reniec.RequestReniec;
-import com.acj.client.appprosegur.model.reniec.ResponseObjectReniec;
-import com.acj.client.appprosegur.model.reniec.ResponseReniec;
 import com.digitalpersona.uareu.Engine;
 import com.digitalpersona.uareu.Fmd;
 import com.digitalpersona.uareu.Reader;
 import com.digitalpersona.uareu.ReaderCollection;
 import com.digitalpersona.uareu.UareUException;
-import com.google.gson.GsonBuilder;
-import com.google.gson.reflect.TypeToken;
-
-import java.lang.reflect.Type;
 
 import cn.pedant.SweetAlert.SweetAlertDialog;
 import lombok.SneakyThrows;
@@ -111,16 +101,16 @@ public class CapturaHuellaActivity extends AppCompatActivity {
         Intent intent = getIntent();
         valor = intent.getStringExtra("clave");
 
-        tvNroOrden = findViewById(R.id.tvNroOrden);
+        /*tvNroOrden = findViewById(R.id.tvNroOrden);
         tvTC = findViewById(R.id.tvTC);
         tvNroDocumento = findViewById(R.id.tvNroDocumento);
         tvFecha = findViewById(R.id.tvFecha);
-        tvTipoProceso = findViewById(R.id.tvTipoProceso);
+        tvTipoProceso = findViewById(R.id.tvTipoProceso); */
         imgManoIzquierda = findViewById(R.id.imgManoIzquierda);
         imgManoDerecha = findViewById(R.id.imgManoDerecha);
-        btn_captura_der = findViewById(R.id.btn_captura_der);
-        btn_captura_izq = findViewById(R.id.btn_captura_izq);
-        fingerprintImageView = (ImageView) findViewById(R.id.fingerprintImageView);
+        btn_captura_der = findViewById(R.id.btnCapturaDer);
+        btn_captura_izq = findViewById(R.id.btnCapturaIzq);
+        //fingerprintImageView = (ImageView) findViewById(R.id.fingerprintImageView);
         mContext = this;
 
 
@@ -175,8 +165,7 @@ public class CapturaHuellaActivity extends AppCompatActivity {
     }
 
     private void mejoresHuellas(String dni){
-        tvTipoProceso.setText("Esperando Mejores Huellas");
-        /*
+        /*tvTipoProceso.setText("Esperando Mejores Huellas");
         MejoresHuellasService mejoresHuellasService = ApiUtils.getApiReniec().create(MejoresHuellasService.class);
         Call<ResponseReniec> call = mejoresHuellasService.getMejoresHuellasReniec(dni);
 
@@ -259,8 +248,6 @@ public class CapturaHuellaActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-
-
     }
 
 

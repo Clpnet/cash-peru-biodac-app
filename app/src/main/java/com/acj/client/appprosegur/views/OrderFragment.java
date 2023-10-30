@@ -1,6 +1,7 @@
-package com.acj.client.appprosegur;
+package com.acj.client.appprosegur.views;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -11,6 +12,7 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.acj.client.appprosegur.R;
 import com.acj.client.appprosegur.api.ApiService.OrderService;
 import com.acj.client.appprosegur.api.ApiUtils;
 import com.acj.client.appprosegur.api.model.OrderResponse;
@@ -18,6 +20,7 @@ import com.acj.client.appprosegur.api.model.constant.StatusResponseEnum;
 import com.acj.client.appprosegur.api.model.dto.OrderDTO;
 import com.acj.client.appprosegur.config.OrderCustomAdapter;
 import com.acj.client.appprosegur.functions.SessionConfig;
+import com.acj.client.appprosegur.views.captura.CapturaHuellaActivity;
 
 import java.util.List;
 
@@ -62,9 +65,9 @@ public class OrderFragment extends Fragment implements OrderCustomAdapter.OnItem
 
     @Override
     public void onItemClick(int position) {
-        /*Intent intent = new Intent(getContext(), CapturaHuellaActivity.class);
+        Intent intent = new Intent(getContext(), CapturaHuellaActivity.class);
         intent.putExtra("clave", String.valueOf(position));
-        startActivity(intent);*/
+        startActivity(intent);
 
         System.out.println("Has hecho clic en el elemento " + position);
     }

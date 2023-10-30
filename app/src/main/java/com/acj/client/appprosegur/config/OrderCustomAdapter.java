@@ -79,7 +79,7 @@ public class OrderCustomAdapter extends RecyclerView.Adapter<OrderCustomAdapter.
 						super(view);
 
 						txtOrderNumber = view.findViewById(R.id.txtOrderNumber);
-						txtCardType = view.findViewById(R.id.txtCardType);
+						txtCardType = view.findViewById(R.id.txtCardDesc);
 						txtDocumentNumber = view.findViewById(R.id.txtDocumentNumber);
 						txtNumberIntent = view.findViewById(R.id.txtNumberIntent);
 						txtFirstDate = view.findViewById(R.id.txtFirstDate);
