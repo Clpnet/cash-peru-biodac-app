@@ -1,6 +1,6 @@
 🌏
 Español |
-[**English**](./README.en.md)
+[**English**](README.en.md)
 
 # Bienvenido a tu nuevo repositorio
 

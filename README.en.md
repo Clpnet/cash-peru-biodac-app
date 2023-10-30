@@ -1,5 +1,5 @@
 🌏
-[**Español**](./README.md) |
+[**Español**](README.md) |
 English
 
 # Welcome to your new repository
