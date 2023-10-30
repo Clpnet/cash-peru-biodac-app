@@ -88,9 +88,6 @@ public class OrderFragment extends Fragment implements OrderCustomAdapter.OnItem
     public void onStart() {
         super.onStart();
         Log.i("STATUS: ", "ON START");
-
-
-
     }
 
 }

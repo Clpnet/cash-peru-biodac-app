@@ -42,11 +42,13 @@
     <string name="txt_ap_materno_desc">CASTRO</string>
     <string name="lbl_id_transaccion_desc">Id Transacción:</string>
     <string name="txt_id_transaccion_desc">12345</string>
+    <string name="txt_intents_error">Ha superado el límite de validaciones.</string>
     <string name="huella_izq_default_desc">Pulgar Izquierdo</string>
     <string name="huella_der_default_desc">Pulgar Derecho</string>
     <string name="img_huella_izq_desc">Imagen de la huella izquierda</string>
     <string name="img_huella_der_desc">Imagen de la huella derecha</string>
     <string name="btn_captura_desc">CAPTURA</string>
+    <string name="btn_espera_huella_desc">ESPERANDO HUELLA</string>
     <string name="btn_otra_consulta_desc">OTRA CONSULTA</string>
 
 
