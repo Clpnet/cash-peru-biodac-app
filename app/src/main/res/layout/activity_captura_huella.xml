@@ -66,7 +66,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/lbl_order_number_desc"
-                        android:textSize="11sp"
+                        android:textSize="14sp"
                         android:textColor="@color/black"
                         android:textStyle="bold"
                         app:layout_constraintTop_toTopOf="@+id/lytOrderDetails"
@@ -78,7 +78,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginStart="3dp"
                         android:text="@string/txt_order_number_desc"
-                        android:textSize="11sp"
+                        android:textSize="14sp"
                         android:textColor="@color/black"
                         android:textStyle="bold"
                         app:layout_constraintStart_toEndOf="@+id/lblCOrderNumber"
@@ -91,7 +91,7 @@
                         android:layout_marginTop="3dp"
                         android:text="@string/txt_order_type_desc"
                         android:textColor="@color/black"
-                        android:textSize="11sp"
+                        android:textSize="14sp"
                         android:textStyle="bold"
                         app:layout_constraintStart_toStartOf="@+id/lytOrderDetails"
                         app:layout_constraintTop_toBottomOf="@+id/lblCOrderNumber" />
@@ -103,7 +103,7 @@
                         android:layout_marginTop="3dp"
                         android:text="@string/txt_card_desc"
                         android:textColor="@color/black"
-                        android:textSize="11sp"
+                        android:textSize="14sp"
                         android:textStyle="bold"
                         app:layout_constraintStart_toStartOf="@+id/lytOrderDetails"
                         app:layout_constraintTop_toBottomOf="@+id/txtCOrderType" />
@@ -115,7 +115,7 @@
                         android:layout_marginTop="3dp"
                         android:text="@string/lbl_doc_number_desc"
                         android:textColor="@color/black"
-                        android:textSize="11sp"
+                        android:textSize="14sp"
                         android:textStyle="bold"
                         app:layout_constraintStart_toStartOf="@+id/lytOrderDetails"
                         app:layout_constraintTop_toBottomOf="@+id/txtCCardDesc" />
@@ -127,7 +127,7 @@
                         android:layout_marginStart="3dp"
                         android:text="@string/txt_doc_number_desc"
                         android:textColor="@color/black"
-                        android:textSize="11sp"
+                        android:textSize="14sp"
                         android:textStyle="bold"
                         app:layout_constraintStart_toEndOf="@+id/lblCDocumentNumber"
                         app:layout_constraintTop_toTopOf="@+id/lblCDocumentNumber" />
@@ -138,8 +138,9 @@
                         android:layout_height="wrap_content"
                         android:text="@string/txt_date_desc"
                         android:textColor="@color/black"
-                        android:textSize="11sp"
+                        android:textSize="14sp"
                         android:textStyle="bold"
+                        app:layout_constraintTop_toBottomOf="@+id/txtCDocumentNumber"
                         app:layout_constraintBottom_toBottomOf="@+id/lytOrderDetails"
                         app:layout_constraintStart_toEndOf="@+id/txtCDocumentNumber"
                         app:layout_constraintEnd_toEndOf="@+id/lytOrderDetails" />
@@ -169,7 +170,9 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="10dp"
+                            android:layout_marginBottom="10dp"
                             android:text="@string/huella_izq_default_desc"
+                            android:textSize="14sp"
                             android:textColor="@color/black"
                             android:textStyle="bold" />
 
@@ -201,7 +204,9 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="10dp"
+                            android:layout_marginBottom="10dp"
                             android:text="@string/huella_der_default_desc"
+                            android:textSize="14sp"
                             android:textColor="@color/black"
                             android:textStyle="bold" />
 
@@ -256,16 +261,19 @@
 
                 <Button
                     android:id="@+id/btnEsperandoHuella"
-                    android:layout_width="180dp"
-                    android:layout_height="25dp"
+                    android:layout_width="160dp"
+                    android:layout_height="35dp"
                     android:layout_marginTop="25dp"
                     android:layout_gravity="center_horizontal"
                     android:background="@drawable/login_button_black"
+                    android:drawableStart="@drawable/ic_loading_24"
                     android:text="@string/btn_espera_huella_desc"
                     android:textColor="@color/Loading_Orange"
                     android:textAllCaps="false"
                     android:textSize="12sp"
                     android:textStyle="bold"
+                    android:padding="5dp"
+                    android:visibility="gone"
                     tools:ignore="ButtonStyle,TouchTargetSizeCheck,TextSizeCheck,DuplicateSpeakableTextCheck" />
 
             </LinearLayout>
@@ -277,6 +285,7 @@
                 android:layout_marginTop="20dp"
                 android:background="@drawable/border_layout"
                 android:padding="15dp"
+                android:visibility="gone"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/lytCaptura"

@@ -20,18 +20,18 @@
             android:id="@+id/imgLogo"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="40dp"
+            android:layout_marginTop="50dp"
+            android:contentDescription="@string/logo_prosegur_desc"
             android:src="@drawable/prosegur_logo"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            android:contentDescription="@string/logo_prosegur_desc" />
+            app:layout_constraintTop_toTopOf="parent" />
 
         <ImageView
             android:id="@+id/imgFingerPrint"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="75dp"
+            android:layout_marginTop="80dp"
             android:contentDescription="@string/logo_fingerprint_desc"
             android:src="@drawable/fingerprint_logo"
             app:layout_constraintEnd_toEndOf="parent"
@@ -42,7 +42,7 @@
             android:id="@+id/txtPrincipal"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="25dp"
+            android:layout_marginTop="20dp"
             android:layout_marginBottom="10dp"
             android:text="@string/principal_desc"
             android:textColor="@color/black"
@@ -133,7 +133,7 @@
             </LinearLayout>
 
             <Button
-                android:id="@+id/btn_login"
+                android:id="@+id/btnLogin"
                 android:layout_width="wrap_content"
                 android:layout_height="32dp"
                 android:layout_gravity="bottom|center"
@@ -145,6 +145,21 @@
                 android:textColor="@color/white" />
 
         </FrameLayout>
+
+        <Button
+            android:id="@+id/btnMicrosoftLogin"
+            android:layout_width="wrap_content"
+            android:layout_height="32dp"
+            android:layout_marginTop="15dp"
+            android:background="@drawable/microsft_login_button"
+            android:drawableStart="@drawable/ic_microsoft_24"
+            android:paddingStart="10dp"
+            android:paddingEnd="35dp"
+            android:text="@string/btn_microsoft_desc"
+            android:textColor="@color/white"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/frameLayout" />
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>

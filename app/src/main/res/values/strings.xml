@@ -1,8 +1,11 @@
 <resources>
-    <string name="app_name">Biodac</string>
+    <string name="app_name">BIODAC</string>
     <string name="app_version">v 1.0</string>
     <string name="powered_by">© 2023 Powered by ACJ Soluciones</string>
     <string name="action_settings">Settings</string>
+
+    <!-- LOADING -->
+    <string name="gf_loading_desc">Gif Cargando</string>
 
     <!-- LOGIN -->
     <string name="logo_prosegur_desc">Logo Prosegur</string>
@@ -12,6 +15,7 @@
     <string name="hint_username_desc">Usuario</string>
     <string name="hint_password_desc">Contraseña</string>
     <string name="btn_ingresar_desc">INGRESAR</string>
+    <string name="btn_microsoft_desc">\t\tLog In with Microsoft</string>
     <string name="principal_desc">Autenticación de Usuario</string>
 
     <!-- MAIN -->
