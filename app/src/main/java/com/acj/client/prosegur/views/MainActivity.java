@@ -12,7 +12,7 @@ import com.acj.client.prosegur.model.constant.OrderStateEnum;
 import com.acj.client.prosegur.model.constant.StatusResponseEnum;
 import com.acj.client.prosegur.model.dto.orders.OrderDTO;
 import com.acj.client.prosegur.databinding.ActivityMainBinding;
-import com.acj.client.prosegur.handler.SessionConfig;
+import com.acj.client.prosegur.config.SessionConfig;
 import com.acj.client.prosegur.views.dialog.LoadingDialogFragment;
 import com.acj.client.prosegur.views.login.LoginActivity;
 import com.google.android.material.appbar.AppBarLayout;
@@ -44,6 +44,8 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 import static com.acj.client.prosegur.util.Constants.LOADING_DIALOG_TAG;
+
+import org.apache.commons.lang3.StringUtils;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -178,21 +180,13 @@ public class MainActivity extends AppCompatActivity {
 				// Agregar filtro de caja de busqueda
 				etxSearchBox.addTextChangedListener(new TextWatcher() {
 						@Override
-						public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-						}
+						public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
 
 						@Override
-						public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-						}
+						public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
 
 						@Override
 						public void afterTextChanged(Editable editable) {
-								// Cerrando teclado virtual
-								/* InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-								imm.hideSoftInputFromWindow(etxSearchBox.getWindowToken(), 0);*/
-
 								// Refrescando la lista
 								updateVisibleContent(null, editable.toString(), Boolean.TRUE);
 						}
@@ -235,7 +229,7 @@ public class MainActivity extends AppCompatActivity {
 								case H:
 										++totalHit;
 										break;
-								case NH:
+								case N:
 										++totalNoHit;
 										break;
 						}
@@ -255,26 +249,25 @@ public class MainActivity extends AppCompatActivity {
 		private void updateVisibleContent(OrderStateEnum stateEnum, String orderNumber, Boolean refresh) {
 				List<OrderDTO> allOrders = SessionConfig.getInstance().getOrderResponse().getObjeto();
 				List<OrderDTO> resultList = new ArrayList<>();
-				AtomicReference<OrderStateEnum> currentState = new AtomicReference<>(SessionConfig.getInstance().getLastSelectedOption());
 
 				if (Objects.nonNull(stateEnum)) {
 						resultList = allOrders.stream()
 								.filter(it -> stateEnum.getCode().equals(it.getEstadoEntrega().getCode()))
 								.collect(Collectors.toList());
 
-						currentState.set(stateEnum);
+						txtCurrentState.setText((OrderStateEnum.Constants.PENDING_CODE.equals(stateEnum.getCode()))
+								? getString(R.string.state_pending_desc)
+								: stateEnum.getDescription());
 				} else if (Objects.nonNull(orderNumber)) {
-						resultList = (orderNumber.length() > 0)
+						boolean wordIsNotEmpty = StringUtils.isNotEmpty(orderNumber);
+
+						resultList = (wordIsNotEmpty)
 								? allOrders.stream()
 								.filter(it -> it.getCodigoOrden().contains(orderNumber))
 								.collect(Collectors.toList()) : allOrders;
 
-						currentState.set((!resultList.isEmpty()) ? resultList.get(0).getEstadoEntrega() : OrderStateEnum.C);
+						txtCurrentState.setText(R.string.state_default_desc);
 				}
-
-				txtCurrentState.setText((OrderStateEnum.Constants.PENDING_CODE.equals(currentState.get().getCode()))
-						? getString(R.string.state_pending_desc)
-						: currentState.get().getDescription());
 
 				SessionConfig.getInstance().setVisibleList(resultList);
 
@@ -296,9 +289,9 @@ public class MainActivity extends AppCompatActivity {
 								updateVisibleContent(OrderStateEnum.H, null, Boolean.TRUE);
 								break;
 						case R.id.opt_no_hit:
-								Log.i(LOG_TAG, "Filtrando solo ordenes con estado " + OrderStateEnum.NH);
-								SessionConfig.getInstance().setLastSelectedOption(OrderStateEnum.NH);
-								updateVisibleContent(OrderStateEnum.NH, null, Boolean.TRUE);
+								Log.i(LOG_TAG, "Filtrando solo ordenes con estado " + OrderStateEnum.N);
+								SessionConfig.getInstance().setLastSelectedOption(OrderStateEnum.N);
+								updateVisibleContent(OrderStateEnum.N, null, Boolean.TRUE);
 								break;
 						case R.id.opt_exit:
 								Intent intentLogin = new Intent(this, LoginActivity.class);

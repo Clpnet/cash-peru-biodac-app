@@ -1,4 +1,4 @@
-package com.acj.client.prosegur.handler;
+package com.acj.client.prosegur.config;
 
 import android.annotation.SuppressLint;
 import android.app.PendingIntent;
@@ -26,6 +26,8 @@ import com.digitalpersona.uareu.dpfpddusbhost.DPFPDDUsbException;
 import com.digitalpersona.uareu.dpfpddusbhost.DPFPDDUsbHost;
 import com.digitalpersona.uareu.jni.DpfjQuality;
 
+import org.apache.commons.lang3.StringUtils;
+
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -40,7 +42,7 @@ import lombok.Setter;
 @Setter
 public class EikonManager {
 
-    private final String LOG_TAG = "EIKON-MANAGER";
+    private final String LOG_TAG = EikonManager.class.getSimpleName();
 
     private String deviceName;
     private ReaderCollection readerCollection;
@@ -67,7 +69,7 @@ public class EikonManager {
 
         this.defaultImageProcessing = Reader.ImageProcessing.IMG_PROC_DEFAULT;
 
-        this.deviceName = "";
+        this.deviceName = StringUtils.EMPTY;
         this.deviceSerialNumber = "N/A";
     }
 
@@ -81,7 +83,7 @@ public class EikonManager {
         @SuppressLint("WrongConstant")
         UsbManager managerFragment = (UsbManager) context.getSystemService("usb");
         HashMap<String, UsbDevice> deviceListFragment = managerFragment.getDeviceList();
-        Iterator deviceIteratorFragment = deviceListFragment.values().iterator();
+        Iterator<UsbDevice> deviceIteratorFragment = deviceListFragment.values().iterator();
 
         UsbDevice deviceFragment = null;
 
@@ -91,7 +93,7 @@ public class EikonManager {
 
         if (Objects.nonNull(deviceFragment)) {
             Log.i(LOG_TAG, "Requesting reader permission. Device Product Name: [" + deviceFragment.getProductName() + "]");
-            managerFragment.requestPermission(deviceFragment, (PendingIntent) mPermissionIntentFragment);
+            managerFragment.requestPermission(deviceFragment, mPermissionIntentFragment);
         } else {
             Log.i(LOG_TAG, "Reader Not Found");
             SweetAlertDialog a = new SweetAlertDialog(context, SweetAlertDialog.ERROR_TYPE);
@@ -106,18 +108,7 @@ public class EikonManager {
                     "Conecte el scanner a su dispositivo");
             a.setConfirmClickListener(sDialog -> {
                 sDialog.dismiss();
-
                 callerActivity.finish();
-
-                /*Intent intent = callerActivity.getIntent();
-                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK
-                        | Intent.FLAG_ACTIVITY_NO_ANIMATION);
-                callerActivity.overridePendingTransition(0, 0);
-                callerActivity.finish();
-
-                callerActivity.overridePendingTransition(0, 0);
-                callerActivity.startActivity(intent);*/
-
                 SessionConfig.getInstance().setAllowedPermission(false);
             });
             a.show();
@@ -134,14 +125,11 @@ public class EikonManager {
             PendingIntent usbPermissionIntent = PendingIntent.getBroadcast(context, 0, new Intent(ACTION_USB_PERMISSION), 0);
             IntentFilter filter = new IntentFilter(ACTION_USB_PERMISSION);
             context.registerReceiver(usbPermissionReceiver, filter);
-            if (!readerCollection.isEmpty()) {
+            if (readerCollection.size() >= 1) {
                 Log.i(LOG_TAG, "Enabling reader");
 
                 deviceName = readerCollection.get(0).GetDescription().name;
                 currentReader = getReader(deviceName);
-
-                /* firstReader.Open(Reader.Priority.COOPERATIVE);
-                firstReader.Close(); */
 
                 if (DPFPDDUsbHost.DPFPDDUsbCheckAndRequestPermissions(context, usbPermissionIntent, deviceName)) {
                     currentReader.Open(Reader.Priority.EXCLUSIVE);
@@ -155,7 +143,7 @@ public class EikonManager {
 
             } else {
                 Log.e(LOG_TAG, "No readers found");
-                deviceName = "";
+                deviceName = StringUtils.EMPTY;
                 throw new RuntimeException("Error ocurred on reader initialization.");
             }
         } catch (UareUException | DPFPDDUsbException e) {
@@ -320,7 +308,7 @@ public class EikonManager {
 
     public String qualityToString(Reader.CaptureResult result) {
         if (result == null) {
-            return "";
+            return StringUtils.EMPTY;
         }
         if (result.quality == null) {
             return "Ocurrió un error";

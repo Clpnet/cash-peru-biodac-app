@@ -31,7 +31,7 @@
             android:id="@+id/imgFingerPrint"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="80dp"
+            android:layout_marginTop="95dp"
             android:contentDescription="@string/logo_fingerprint_desc"
             android:src="@drawable/fingerprint_logo"
             app:layout_constraintEnd_toEndOf="parent"

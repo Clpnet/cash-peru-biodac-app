@@ -7,7 +7,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Button;
 
-import com.acj.client.prosegur.handler.LoadingDialogHandler;
 import com.acj.client.prosegur.views.MainActivity;
 import com.acj.client.prosegur.R;
 import com.acj.client.prosegur.databinding.ActivityLoginBinding;
@@ -17,8 +16,6 @@ public class LoginActivity extends AppCompatActivity {
     private Button btn_login;
 
     private ActivityLoginBinding loginBinding;
-
-    private LoadingDialogHandler dialogHandler;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,8 +33,6 @@ public class LoginActivity extends AppCompatActivity {
 
             finish();
         });
-
-        dialogHandler = new LoadingDialogHandler(LoginActivity.this);
     }
 
     @Override

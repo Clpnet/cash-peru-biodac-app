@@ -5,7 +5,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".views.captura.CapturaHuellaActivity">
+    tools:context=".views.adapter.CapturaHuellaActivity">
 
     <include
         android:id="@+id/captura_header"
@@ -33,15 +33,15 @@
                 android:id="@+id/txtCapturaHuella"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:gravity="center"
                 android:layout_weight="1"
+                android:gravity="center"
+                android:padding="20dp"
                 android:text="@string/title_captura"
                 android:textColor="@color/black"
                 android:textStyle="bold"
-                android:padding="13dp"
-                app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent"/>
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
             <LinearLayout
                 android:id="@+id/lytCaptura"
@@ -273,6 +273,8 @@
                     android:textSize="12sp"
                     android:textStyle="bold"
                     android:padding="5dp"
+                    android:enabled="false"
+                    android:clickable="false"
                     android:visibility="gone"
                     tools:ignore="ButtonStyle,TouchTargetSizeCheck,TextSizeCheck,DuplicateSpeakableTextCheck" />
 

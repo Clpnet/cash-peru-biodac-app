@@ -20,10 +20,27 @@
 
     <!-- MAIN -->
     <string name="ic_dropdown_desc">Icono caja de texto Usuario</string>
+    <string name="state_default_desc">ORDENES</string>
     <string name="state_pending_desc">PENDIENTES</string>
     <string name="state_hit_desc">HIT</string>
     <string name="state_nohit_desc">NO HIT</string>
     <string name="search_desc">ORDENES PROCESADAS</string>
+
+    <!-- CARD -->
+    <string name="lbl_card_order_number">Nro de Orden:</string>
+    <string name="txt_card_order_number_desc">11111111111111</string>
+    <string name="txt_card_order_type_desc">TC</string>
+    <string name="txt_card_card_desc">INTERBANK</string>
+    <string name="lbl_card_document_number">N° de Documento:</string>
+    <string name="txt_card_document_number_desc">70985144</string>
+    <string name="lbl_card_fec_entrega">Fec. Entrega:</string>
+    <string name="txt_card_fec_entrega_desc">01/02/2023 06:05:01</string>
+    <string name="txt_number_intent_desc">N° de Intentos (%s)</string>
+    <string name="txt_estado_validado_desc">Validado</string>
+    <string name="lbl_card_fec_ult_intento">Último Intento:</string>
+    <string name="txt_card_fec_ult_intento_desc">01/02/2023 06:05:01</string>
+    <string name="btn_card_default_state">Creado</string>
+
 
     <!-- CAPTURA -->
     <string name="title_captura">CAPTURA DE HUELLA</string>
@@ -59,8 +76,5 @@
     <string name="pending_option_desc">Órdenes Pendientes (%s)</string>
     <string name="hit_option_desc">Órdenes Hit (%s)</string>
     <string name="nohit_option_desc">Órdenes No Hit (%s)</string>
-
-    <string name="number_intent_desc">N° de Intentos (%s)</string>
-
 
 </resources>

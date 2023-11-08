@@ -1,4 +1,4 @@
-package com.acj.client.prosegur.model.dto.reniec;
+package com.acj.client.prosegur.model.dto.biometric;
 
 import java.io.Serializable;
 
@@ -33,5 +33,7 @@ public class ResponseObjectReniec implements Serializable {
     private String vigencia;
     private String restriccion;
     private String grupoRestriccion;
+    private Integer totalIntentos;
+    private String identificadorTransaccion;
 
 }

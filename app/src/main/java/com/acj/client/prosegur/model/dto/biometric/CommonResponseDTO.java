@@ -1,4 +1,4 @@
-package com.acj.client.prosegur.model.dto.reniec;
+package com.acj.client.prosegur.model.dto.biometric;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -21,7 +21,7 @@ import lombok.ToString;
 @ToString
 @RequiredArgsConstructor
 @AllArgsConstructor
-public class ResponseReniec {
+public class CommonResponseDTO {
 
     private String codigo;
     private String mensaje;

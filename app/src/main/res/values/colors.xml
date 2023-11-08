@@ -29,6 +29,7 @@
     <color name="Gray">#736F6E</color>
     <color name="Gray_Light">#D8D8D8</color>
     <color name="Loading_Orange">#D39E39</color>
+    <color name="Hard_Red">#D30C0C</color>
 
     <color name="yellow_prosegur">#F4D44C</color>
 </resources>

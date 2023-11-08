@@ -15,15 +15,15 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.acj.client.prosegur.R;
 import com.acj.client.prosegur.model.constant.OrderStateEnum;
 import com.acj.client.prosegur.model.dto.orders.OrderDTO;
-import com.acj.client.prosegur.config.OrderCustomAdapter;
+import com.acj.client.prosegur.views.config.OrderCustomAdapter;
 import com.acj.client.prosegur.model.constant.EnumExtra;
-import com.acj.client.prosegur.views.captura.CapturaHuellaActivity;
+import com.acj.client.prosegur.views.adapter.CapturaHuellaActivity;
 
 import java.util.List;
 
 public class OrderFragment extends Fragment implements OrderCustomAdapter.OnItemClickListener {
 
-    private final String LOG_TAG = "ORDER-FRAGMENT";
+    private final String LOG_TAG = OrderFragment.class.getSimpleName();
 
     private RecyclerView recyclerView;
     private Context context;

@@ -9,7 +9,7 @@ public enum OrderStateEnum {
 
 		C(Constants.PENDING_CODE, "CREADO"),
 		H(Constants.HIT_CODE, "HIT"),
-		NH(Constants.NO_HIT_CODE, "NO HIT")
+		N(Constants.NO_HIT_CODE, "NO HIT")
 		;
 
 		private final String code;
@@ -19,7 +19,7 @@ public enum OrderStateEnum {
 
 				public static String PENDING_CODE = "C";
 				public static String HIT_CODE = "H";
-				public static String NO_HIT_CODE = "NH";
+				public static String NO_HIT_CODE = "N";
 
 		}
 

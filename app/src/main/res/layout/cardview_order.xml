@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:theme="@style/Theme.MaterialComponents"
@@ -22,17 +23,21 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="15dp"
             android:layout_marginTop="15dp"
-            android:text="Nro de Orden:"
-            android:textColor="#000000" />
+            android:text="@string/lbl_card_order_number"
+            android:textColor="#000000"
+            android:textStyle="bold"
+            tools:ignore="RelativeOverlap" />
 
         <TextView
             android:id="@+id/txtOrderNumber"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="120dp"
+            android:layout_marginStart="108dp"
             android:layout_marginTop="15dp"
-            android:text="11111111111111"
-            android:textColor="#000000" />
+            android:text="@string/txt_card_order_number_desc"
+            android:textColor="#000000"
+            android:textStyle="bold"
+            tools:ignore="RelativeOverlap" />
 
         <TextView
             android:id="@+id/txtOrderType"
@@ -40,8 +45,10 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="15dp"
             android:layout_marginTop="35dp"
-            android:text="TC"
-            android:textColor="#000000" />
+            android:text="@string/txt_card_order_type_desc"
+            android:textColor="#000000"
+            android:textStyle="bold"
+            tools:ignore="RelativeOverlap" />
 
         <TextView
             android:id="@+id/txtCardDesc"
@@ -49,8 +56,10 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="15dp"
             android:layout_marginTop="55dp"
-            android:text="INTERBANK"
-            android:textColor="#000000" />
+            android:text="@string/txt_card_card_desc"
+            android:textColor="#000000"
+            android:textStyle="bold"
+            tools:ignore="RelativeOverlap" />
 
         <TextView
             android:id="@+id/lblDocumentNumber"
@@ -58,8 +67,10 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="15dp"
             android:layout_marginTop="75dp"
-            android:text="N° de Documento:"
-            android:textColor="#000000" />
+            android:text="@string/lbl_card_document_number"
+            android:textColor="#000000"
+            android:textStyle="bold"
+            tools:ignore="RelativeOverlap" />
 
         <TextView
             android:id="@+id/txtDocumentNumber"
@@ -67,48 +78,89 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="135dp"
             android:layout_marginTop="75dp"
-            android:text="70985144"
-            android:textColor="#000000" />
+            android:text="@string/txt_card_document_number_desc"
+            android:textColor="#000000"
+            android:textStyle="bold"
+            tools:ignore="RelativeOverlap" />
+
+        <TextView
+            android:id="@+id/lblFechaEntrega"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="15dp"
+            android:layout_marginTop="95dp"
+            android:text="@string/lbl_card_fec_entrega"
+            android:textColor="#000000"
+            android:textStyle="bold"
+            tools:ignore="RelativeOverlap" />
+
+        <TextView
+            android:id="@+id/txtFechaEntrega"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="103dp"
+            android:layout_marginTop="95dp"
+            android:text="@string/txt_card_fec_entrega_desc"
+            android:textColor="#000000"
+            android:textStyle="bold"
+            tools:ignore="RelativeOverlap" />
 
         <TextView
             android:id="@+id/txtNumberIntent"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="15dp"
-            android:layout_marginTop="95dp"
-            android:text="@string/number_intent_desc"
-            android:textColor="#000000" />
+            android:layout_marginTop="115dp"
+            android:text="@string/txt_number_intent_desc"
+            android:textColor="@color/Hard_Red"
+            android:textStyle="bold"
+            android:visibility="gone"
+            tools:ignore="RelativeOverlap" />
 
         <TextView
-            android:id="@+id/txtFirstDate"
+            android:id="@+id/txtEstadoValidado"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentEnd="true"
-            android:layout_marginTop="105dp"
-            android:layout_marginEnd="15dp"
-            android:text="01/02/2023 06:05:01"
-            android:textColor="#000000" />
+            android:layout_marginStart="15dp"
+            android:layout_marginTop="115dp"
+            android:text="@string/txt_estado_validado_desc"
+            android:textColor="#000000"
+            android:textStyle="bold"
+            android:visibility="gone"
+            tools:ignore="RelativeOverlap" />
 
         <TextView
-            android:id="@+id/txtSecondDate"
+            android:id="@+id/lblUltimoIntento"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentEnd="true"
-            android:layout_marginTop="130dp"
-            android:layout_marginEnd="15dp"
-            android:text="01/02/2023 12:08:01"
-            android:textColor="#000000" />
+            android:layout_marginStart="15dp"
+            android:layout_marginTop="115dp"
+            android:visibility="gone"
+            android:text="@string/lbl_card_fec_ult_intento"
+            android:textColor="#000000"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/txtUltimoIntento"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="115dp"
+            android:layout_marginTop="115dp"
+            android:visibility="gone"
+            android:text="@string/txt_card_fec_ult_intento_desc"
+            android:textColor="#000000"
+            android:textStyle="bold" />
 
         <Button
             android:id="@+id/btnStatus"
             android:layout_width="100dp"
             android:layout_height="25dp"
-            android:layout_marginStart="15dp"
-            android:layout_marginTop="120dp"
+            android:layout_marginStart="125dp"
+            android:layout_marginTop="145dp"
             android:layout_marginBottom="10dp"
             android:background="@drawable/button_pending"
             android:enabled="false"
-            android:text="Creado"
+            android:text="@string/btn_card_default_state"
             android:textStyle="bold"
             android:textAllCaps="false"
             android:textColor="#FFFFFF" />

@@ -1,10 +1,12 @@
-package com.acj.client.prosegur.handler;
+package com.acj.client.prosegur.config;
 
 import android.util.Log;
 
 import com.acj.client.prosegur.model.common.OrderResponse;
 import com.acj.client.prosegur.model.constant.OrderStateEnum;
 import com.acj.client.prosegur.model.dto.orders.OrderDTO;
+
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.List;
 
@@ -16,8 +18,9 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 public class SessionConfig {
+    private static final String TAG = SessionConfig.class.getSimpleName();
+
     private static SessionConfig GLOBAL = null;
-    private static final String TAG = "-----GLOBAL_CONFIG";
 
     // Order Data
     private OrderResponse orderResponse;
@@ -26,19 +29,9 @@ public class SessionConfig {
     private Integer totalHit = 0;
     private Integer totalNoHit = 0;
 
-    private String marcaLector = "EIKON";
-    private Integer tipoHuellero = null;
-    private Integer tipoServicio = null;
-    private Integer tipoBiometria = null;
     private OrderStateEnum lastSelectedOption = null;
 
-    private String tokenAuth = "";
-    private Integer idEmpresa = null;
-    private String razonSocial = "";
-    private String Direccion = "";
-    private String numeroDocumentoUsuario = null;
-    private int bienvenida = 0;
-    private int intentosXManos = 1;
+    private String tokenAuth = StringUtils.EMPTY;
 
     // Eikon Globals
     private boolean allowedPermission = false;

@@ -1,4 +1,4 @@
-package com.acj.client.prosegur.config;
+package com.acj.client.prosegur.views.config;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -13,8 +13,11 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.acj.client.prosegur.R;
 import com.acj.client.prosegur.model.dto.orders.OrderDTO;
+import com.acj.client.prosegur.util.Util;
 import com.google.android.material.card.MaterialCardView;
 import com.acj.client.prosegur.model.constant.OrderStateEnum;
+
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.List;
 
@@ -48,22 +51,17 @@ public class OrderCustomAdapter extends RecyclerView.Adapter<OrderCustomAdapter.
 				holder.txtOrderNumber.setText(orden.getCodigoOrden());
 				holder.txtOrderType.setText(orden.getTipoOrden());
 				holder.txtCardType.setText(orden.getTipoTarjeta());
-				holder.txtDocumentNumber.setText(orden.getNumeroDocumento().substring(0, 4) + "****");
+				holder.txtDocumentNumber.setText(Util.obfuscateKeep(orden.getNumeroDocumento(), 4, Boolean.TRUE));
 
 				int numberIntent = orden.getOrdenesIntento().isEmpty()
 						? (orden.getOrdenesIntento().size() + 1) : orden.getOrdenesIntento().size();
 
 				holder.txtNumberIntent.setText((numberIntent > 0)
-						? String.format(context.getString(R.string.number_intent_desc), String.valueOf(numberIntent))
-						: "");
-				holder.txtFirstDate.setText(orden.getFechaEntrega());
+						? String.format(context.getString(R.string.txt_number_intent_desc), String.valueOf(numberIntent))
+						: StringUtils.EMPTY);
+				holder.txtDeliveryDate.setText(orden.getFechaEntrega());
 
-				holder.txtSecondDate.setVisibility(View.INVISIBLE); // SERGIO SICCHA -> POR AHORA SE OCULTA
-
-				/* if (orden.getOrdenesIntento().isEmpty()) holder.txtSecondDate.setVisibility(View.INVISIBLE);
-
-				holder.txtSecondDate.setText( (!orden.getOrdenesIntento().isEmpty())
-						? orden.getOrdenesIntento().get(0).getFechaCreacion() : "" ); */
+				showDynamicFields(holder, orden);
 
 				OrderStateEnum orderState = orden.getEstadoEntrega();
 
@@ -83,10 +81,19 @@ public class OrderCustomAdapter extends RecyclerView.Adapter<OrderCustomAdapter.
 
 		public static class ViewHolder extends RecyclerView.ViewHolder {
 
-				private TextView txtOrderNumber, txtOrderType, txtCardType, txtDocumentNumber,
-						txtNumberIntent, txtFirstDate, txtSecondDate;
-				private Button btnEstado;
-				private MaterialCardView cardview;
+				private final TextView txtOrderNumber;
+				private final TextView txtOrderType;
+				private final TextView txtCardType;
+				private final TextView txtDocumentNumber;
+				private final TextView txtDeliveryDate;
+				private final Button btnEstado;
+				private final MaterialCardView cardview;
+
+				// Campos dinamicos
+				private final TextView txtNumberIntent;
+				private final TextView lblLastIntentDate;
+				private final TextView txtLastIntentDate;
+				private final TextView txtValidatedState;
 
 				public ViewHolder(View view) {
 						super(view);
@@ -95,11 +102,14 @@ public class OrderCustomAdapter extends RecyclerView.Adapter<OrderCustomAdapter.
 						txtOrderType = view.findViewById(R.id.txtOrderType);
 						txtCardType = view.findViewById(R.id.txtCardDesc);
 						txtDocumentNumber = view.findViewById(R.id.txtDocumentNumber);
-						txtNumberIntent = view.findViewById(R.id.txtNumberIntent);
-						txtFirstDate = view.findViewById(R.id.txtFirstDate);
-						txtSecondDate = view.findViewById(R.id.txtSecondDate);
+						txtDeliveryDate = view.findViewById(R.id.txtFechaEntrega);
 						cardview = view.findViewById(R.id.cdvOrder);
 						btnEstado = view.findViewById(R.id.btnStatus);
+
+						txtNumberIntent = view.findViewById(R.id.txtNumberIntent);
+						lblLastIntentDate = view.findViewById(R.id.lblUltimoIntento);
+						txtLastIntentDate = view.findViewById(R.id.txtUltimoIntento);
+						txtValidatedState = view.findViewById(R.id.txtEstadoValidado);
 
 				}
 		}
@@ -112,11 +122,28 @@ public class OrderCustomAdapter extends RecyclerView.Adapter<OrderCustomAdapter.
 				switch (stateEnum) {
 						case H:
 								return R.drawable.button_hit;
-						case NH:
+						case N:
 								return R.drawable.button_no_hit;
 						default:
 								return R.drawable.button_pending;
 				}
+		}
+
+		private void showDynamicFields(ViewHolder holder, OrderDTO orden) {
+				OrderStateEnum currentState = orden.getEstadoEntrega();
+
+			if (OrderStateEnum.Constants.HIT_CODE.equals(currentState.getCode())) {
+					holder.txtValidatedState.setVisibility(View.VISIBLE);
+			} else if (OrderStateEnum.Constants.NO_HIT_CODE.equals(currentState.getCode())) {
+					boolean hasIntent = !orden.getOrdenesIntento().isEmpty();
+					holder.txtLastIntentDate.setText( (hasIntent)
+							? orden.getOrdenesIntento().get(0).getFechaCreacion()
+							: StringUtils.EMPTY);
+					holder.lblLastIntentDate.setVisibility((hasIntent) ? View.VISIBLE : View.GONE);
+					holder.txtLastIntentDate.setVisibility((hasIntent) ? View.VISIBLE : View.GONE);
+			} else {
+					holder.txtNumberIntent.setVisibility(View.VISIBLE);
+			}
 		}
 
 }
