@@ -2,9 +2,12 @@ package com.acj.client.prosegur.config;
 
 import android.util.Log;
 
-import com.acj.client.prosegur.model.common.OrderResponse;
+import com.acj.client.prosegur.model.common.CommonResponse;
 import com.acj.client.prosegur.model.constant.OrderStateEnum;
 import com.acj.client.prosegur.model.dto.orders.OrderDTO;
+import com.acj.client.prosegur.model.dto.user.UserDetailsDTO;
+import com.microsoft.identity.client.IAccount;
+import com.microsoft.identity.client.ISingleAccountPublicClientApplication;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -22,8 +25,12 @@ public class SessionConfig {
 
     private static SessionConfig GLOBAL = null;
 
+    // Session Data
+    private UserDetailsDTO userDetails;
+
     // Order Data
-    private OrderResponse orderResponse;
+    private CommonResponse commonResponse;
+    private List<OrderDTO> allOrders;
     private List<OrderDTO> visibleList;
     private Integer totalPending = 0;
     private Integer totalHit = 0;
@@ -37,6 +44,11 @@ public class SessionConfig {
     private boolean allowedPermission = false;
     private boolean isReaderEnabled = false;
 
+    // Microsoft Entra
+    private ISingleAccountPublicClientApplication mSingleAccountApp = null;
+    private IAccount mAccount = null;
+    private String accessToken = null;
+
     public static synchronized SessionConfig getInstance() {
         if (null == GLOBAL) {
             Log.i(TAG, "---------- Se inicializo el GlobalConfig.---------");
@@ -48,6 +60,10 @@ public class SessionConfig {
     public static synchronized void closeSession() {
         Log.i(TAG, "---------- Cerrando Sesion ---------");
         GLOBAL = null;
+    }
+
+    public static Boolean sessionExists() {
+        return GLOBAL != null;
     }
 
 }

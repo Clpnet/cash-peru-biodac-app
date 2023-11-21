@@ -1,0 +1,16 @@
+{
+  "client_id" : "f1c40138-b8e9-45ec-9f4d-3b2325698157",
+  "authorization_user_agent" : "DEFAULT",
+  "redirect_uri" : "msauth://com.acj.client.prosegur/nqbKIP5JESfLp6RxsBQMvelNxSM%3D",
+  "account_mode": "SINGLE",
+  "broker_redirect_uri_registered": false,
+  "authorities" : [
+    {
+      "type": "AAD",
+      "audience": {
+        "type": "AzureADMyOrg",
+        "tenant_id": "68485601-fbbc-47c6-b156-3e1a7e0a4434"
+      }
+    }
+  ]
+}

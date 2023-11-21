@@ -1,33 +1,28 @@
 package com.acj.client.prosegur.util;
 
-import android.content.Context;
 import android.graphics.Bitmap;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.util.Base64;
 import android.util.Log;
 
+import androidx.annotation.NonNull;
+
+import com.acj.client.prosegur.config.SessionConfig;
+import com.google.gson.GsonBuilder;
+import com.microsoft.identity.client.ISingleAccountPublicClientApplication;
+import com.microsoft.identity.client.exception.MsalException;
+
 import org.apache.commons.lang3.StringUtils;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.FutureTask;
-import java.util.concurrent.RunnableFuture;
+import java.util.Objects;
 
 public class Util {
 
-    private final static String TAG = Util.class.getSimpleName();
+    private final static String LOG_TAG = Util.class.getSimpleName();
 
     public static String bytesToString(byte[] bytesATransformar) {
         String base64 = Base64.encodeToString(bytesATransformar, Base64.NO_WRAP);
-        Log.d(TAG, "Byte to string: " + base64);
+        Log.d(LOG_TAG, "Byte to string: " + base64);
         base64 = base64.replace(",", StringUtils.EMPTY);
         return base64;
 
@@ -50,6 +45,33 @@ public class Util {
         return (reverse)
             ? value.substring(0, keepQuantity).concat(StringUtils.repeat("*", obfuscateQuantity))
             : StringUtils.repeat("*", obfuscateQuantity).concat(value.substring(obfuscateQuantity));
+    }
+
+    public static <T> T jsonToClass(Object data, Class<T> clazz) {
+        GsonBuilder gson = new GsonBuilder();
+        String json = gson.create().toJson(data);
+        return gson.create().fromJson(json, clazz);
+    }
+
+    public static void killSessionOnMicrosoft() {
+        ISingleAccountPublicClientApplication mSingleAccountApp = SessionConfig.getInstance().getMSingleAccountApp();
+
+        if (Objects.isNull(mSingleAccountApp)) return;
+
+        Log.i(LOG_TAG, "Cerrando al sesion activa en microsoft");
+
+        mSingleAccountApp.signOut(new ISingleAccountPublicClientApplication.SignOutCallback() {
+            @Override
+            public void onSignOut() {
+                Log.i(LOG_TAG, "La sesion se cerro correctamente");
+                SessionConfig.getInstance().setMAccount(null);
+            }
+
+            @Override
+            public void onError(@NonNull MsalException exception) {
+                Log.e(LOG_TAG, "Ocurrio un error en el cierre de sesion del usuario. Exception: " + exception);
+            }
+        });
     }
 
 }

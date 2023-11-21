@@ -1,4 +1,4 @@
-package com.acj.client.prosegur.views.adapter;
+package com.acj.client.prosegur.views.captura;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
@@ -26,16 +26,17 @@ import android.widget.TextView;
 
 import com.acj.client.prosegur.api.ApiService.DatoBiometricoService;
 import com.acj.client.prosegur.api.ApiUtils;
+import com.acj.client.prosegur.model.common.CommonResponse;
 import com.acj.client.prosegur.model.constant.ErrorReniecEnum;
 import com.acj.client.prosegur.model.constant.FingerEnum;
 import com.acj.client.prosegur.model.constant.OrderStateEnum;
 import com.acj.client.prosegur.model.constant.StatusResponseEnum;
+import com.acj.client.prosegur.model.dto.biometric.ResponseObjectReniec;
 import com.acj.client.prosegur.model.dto.orders.OrderDTO;
 import com.acj.client.prosegur.config.EikonManager;
 import com.acj.client.prosegur.model.constant.EnumExtra;
 import com.acj.client.prosegur.R;
 import com.acj.client.prosegur.config.SessionConfig;
-import com.acj.client.prosegur.model.dto.biometric.CommonResponseDTO;
 import com.acj.client.prosegur.util.Util;
 import com.acj.client.prosegur.model.dto.biometric.RequestValidateDTO;
 import com.acj.client.prosegur.views.dialog.LoadingDialogFragment;
@@ -52,6 +53,7 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 import static com.acj.client.prosegur.util.Constants.LOADING_DIALOG_TAG;
+import static com.acj.client.prosegur.util.Util.killSessionOnMicrosoft;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -106,8 +108,8 @@ public class CapturaHuellaActivity extends AppCompatActivity {
 
     // Variables Globales
     private OrderDTO currentOrder;
-    private CommonResponseDTO mejoresHuellasResponse;
-    private CommonResponseDTO validacionResponse;
+    private ResponseObjectReniec mejoresHuellasResponse;
+    private ResponseObjectReniec validacionResponse;
 
     private Context mContext;
 
@@ -140,7 +142,7 @@ public class CapturaHuellaActivity extends AppCompatActivity {
         setOrderContent();
 
         // Init service objects
-        datoBiometricoService = ApiUtils.getApi().create(DatoBiometricoService.class);
+        datoBiometricoService = ApiUtils.getApi(mContext).create(DatoBiometricoService.class);
 
         eikonManager = new EikonManager(mContext);
         eikonManager.requestPermission(captureUsbReceiver, CapturaHuellaActivity.this);
@@ -242,21 +244,20 @@ public class CapturaHuellaActivity extends AppCompatActivity {
     }
 
     private void getMejoresHuellas() {
-        Call<CommonResponseDTO> call = datoBiometricoService.findBetterFootprints(currentOrder.getNumeroDocumento());
-
-        call.enqueue(new Callback<CommonResponseDTO>() {
+        datoBiometricoService.findBetterFootprints(currentOrder.getNumeroDocumento()).enqueue(new Callback<CommonResponse>() {
             @Override
-            public void onResponse(Call<CommonResponseDTO> call, Response<CommonResponseDTO> response) {
-                if (response.isSuccessful() && StatusResponseEnum.SUCCESS.getCode().equals(response.body().getCodigo())) {
-                    Log.i(LOG_TAG, "getMejoresHuellas() -> Respuesta exitosa en la busqueda de mejores huellas. Response [" + response.body().getObjeto() + "]");
+            public void onResponse(Call<CommonResponse> call, Response<CommonResponse> response) {
+                if (response.isSuccessful() && StatusResponseEnum.SUCCESS.getCode().equals(response.body().getCabecera().getCodigo())) {
+                    mejoresHuellasResponse = Util.jsonToClass(response.body().getObjeto(), ResponseObjectReniec.class);
 
-                    mejoresHuellasResponse = response.body();
+                    Log.i(LOG_TAG, "getMejoresHuellas() -> Respuesta exitosa en la busqueda de mejores huellas. " +
+                        "Response [" + mejoresHuellasResponse + "]");
 
-                    lblHuellaIzq.setText(mejoresHuellasResponse.getObjeto().getMejorHuellaIzquierdaDesc());
-                    lblHuellaDer.setText(mejoresHuellasResponse.getObjeto().getMejorHuellaDerechaDesc());
+                    lblHuellaIzq.setText(mejoresHuellasResponse.getMejorHuellaIzquierdaDesc());
+                    lblHuellaDer.setText(mejoresHuellasResponse.getMejorHuellaDerechaDesc());
 
-                    imgManoIzq.setImageResource(FingerEnum.getFinderByCod(mejoresHuellasResponse.getObjeto().getMejorHuellaIzquierda()).getImage());
-                    imgManoDer.setImageResource(FingerEnum.getFinderByCod(mejoresHuellasResponse.getObjeto().getMejorHuellaDerecha()).getImage());
+                    imgManoIzq.setImageResource(FingerEnum.getFinderByCod(mejoresHuellasResponse.getMejorHuellaIzquierda()).getImage());
+                    imgManoDer.setImageResource(FingerEnum.getFinderByCod(mejoresHuellasResponse.getMejorHuellaDerecha()).getImage());
 
                     updateCaptureButtonState(Boolean.TRUE);
 
@@ -269,7 +270,7 @@ public class CapturaHuellaActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onFailure(Call<CommonResponseDTO> call, Throwable err) {
+            public void onFailure(Call<CommonResponse> call, Throwable err) {
                 Log.e(LOG_TAG, "getMejoresHuellas.onFailure() -> Ocurrió un error en el GET MEJORES HUELLAS. [" + err + "]");
                 closeDialog(Boolean.FALSE);
             }
@@ -305,10 +306,7 @@ public class CapturaHuellaActivity extends AppCompatActivity {
                 SessionConfig.getInstance().setLastSelectedOption(OrderStateEnum.N);
                 break;
             case R.id.opt_exit:
-                Intent intentLogin = new Intent(this, LoginActivity.class);
-                startActivity(intentLogin);
-                SessionConfig.closeSession();
-                finishAffinity();
+                exit();
                 break;
         }
 
@@ -384,15 +382,24 @@ public class CapturaHuellaActivity extends AppCompatActivity {
 
     public void showResult() {
         txtResultDocumentNumber.setText(currentOrder.getNumeroDocumento());
-        txtResultCode.setText(StringUtils.join(validacionResponse.getObjeto().getCodigoErrorReniec(), ":"));
-        txtResultDescription.setText(validacionResponse.getObjeto().getDescripcionErrorReniec());
+        txtResultCode.setText(StringUtils.join(validacionResponse.getCodigoErrorReniec(), ":"));
+        txtResultDescription.setText(validacionResponse.getDescripcionErrorReniec());
         txtResultNombres.setText(currentOrder.getNombre());
         txtResultApPaterno.setText(currentOrder.getApellidoPaterno());
         txtResultApMaterno.setText(currentOrder.getApellidoMaterno());
-        txtResultIdTransaccion.setText(validacionResponse.getObjeto().getIdentificadorTransaccion());
+        txtResultIdTransaccion.setText(validacionResponse.getIdentificadorTransaccion());
 
         updateCaptureButtonState(Boolean.FALSE);
         lytResultados.setVisibility(View.VISIBLE);
+    }
+
+    public void exit() {
+        killSessionOnMicrosoft(); // SERGIO SICCHA -> VALIDAR SI AL MORIR APLICACION DEBE CERRAR SESION DE AZURE
+        SessionConfig.closeSession();
+
+        Intent intentLogin = new Intent(this, LoginActivity.class);
+        startActivity(intentLogin);
+        finishAffinity();
     }
 
     public void showInfoDialog(String title, String message, DialogInterface.OnClickListener listener) {
@@ -424,219 +431,76 @@ public class CapturaHuellaActivity extends AppCompatActivity {
         requestValidateDTO.setIdOrdenDetalle(currentOrder.getIdOrdenDetalle());
         requestValidateDTO.setNumeroSerie(deviceSerialNumber);
         requestValidateDTO.setIdentificadorDedo((ButtonEnum.IZQ.toString().equals(buttonPressed))
-            ? Integer.valueOf(mejoresHuellasResponse.getObjeto().getMejorHuellaIzquierda())
-            : Integer.valueOf(mejoresHuellasResponse.getObjeto().getMejorHuellaDerecha()));
+            ? Integer.valueOf(mejoresHuellasResponse.getMejorHuellaIzquierda())
+            : Integer.valueOf(mejoresHuellasResponse.getMejorHuellaDerecha()));
         requestValidateDTO.setTemplate(fingerPrintBytes);
         requestValidateDTO.setCalidadCaptura(captureScore);
 
         Log.i(LOG_TAG, "validateFingerprint() -> Validate Capture Request [" + requestValidateDTO + "]");
 
-        Call<CommonResponseDTO> callCapture = datoBiometricoService.validateCapture(requestValidateDTO);
-        callCapture.enqueue(new Callback<CommonResponseDTO>() {
+        Call<CommonResponse> callCapture = datoBiometricoService.validateCapture(requestValidateDTO);
+        callCapture.enqueue(new Callback<CommonResponse>() {
             @Override
-            public void onResponse(Call<CommonResponseDTO> call, Response<CommonResponseDTO> response) {
+            public void onResponse(Call<CommonResponse> call, Response<CommonResponse> response) {
 
                 if (response.isSuccessful()) {
-                    Log.i(LOG_TAG, "validateCapture.onResponse() -> Respuesta exitosa de la validacion dactilar. " +
-                        "Response [" + response.body().getObjeto() + "]");
 
-                    validacionResponse = response.body();
+                    if (StatusResponseEnum.SUCCESS.getCode().equals(response.body().getCabecera().getCodigo())) {
+                        validacionResponse = Util.jsonToClass(response.body().getObjeto(), ResponseObjectReniec.class);
 
-                    closeDialog(Boolean.TRUE);
+                        Log.i(LOG_TAG, "validateCapture.onResponse() -> Respuesta exitosa de la validacion dactilar. " +
+                            "Response [" + validacionResponse + "]");
 
-                    if (ErrorReniecEnum.NO_HIT.getCode().equals(validacionResponse.getObjeto().getCodigoErrorReniec())) {
+                        closeDialog(Boolean.TRUE);
 
-                        // SERGIO SICCHA -> PARAMETRIZAR INTENTOS
-                        if (validacionResponse.getObjeto().getTotalIntentos() < 3) {
-                            dialogBuilder
-                                .setTitle("AVISO")
-                                .setMessage("Validación Incorrecta\n¿Desea reintentar?")
-                                .setCancelable(false)
-                                .setPositiveButton("SI", (dialog, which) -> updateCaptureButtonState(Boolean.TRUE))
-                                .setNegativeButton("NO", (dialog, which) -> finish())
-                                .create().show();
-                        } else {
-                            showInfoDialog("Validación Incorrecta",
-                                "Ha agotado el total de intentos permitidos\npara realizar la validación dactilar",
-                                (dialog, which) -> finish());
+                        if (ErrorReniecEnum.NO_HIT.getCode().equals(validacionResponse.getCodigoErrorReniec())) {
+
+                            // SERGIO SICCHA -> PARAMETRIZAR INTENTOS
+                            if (validacionResponse.getTotalIntentos() < 3) {
+                                dialogBuilder
+                                    .setTitle("AVISO")
+                                    .setMessage("Validación Incorrecta\n¿Desea reintentar?")
+                                    .setCancelable(false)
+                                    .setPositiveButton("SI", (dialog, which) -> updateCaptureButtonState(Boolean.TRUE))
+                                    .setNegativeButton("NO", (dialog, which) -> finish())
+                                    .create().show();
+                            } else {
+                                showInfoDialog("Validación Incorrecta",
+                                    "Ha agotado el total de intentos permitidos\npara realizar la validación dactilar",
+                                    (dialog, which) -> finish());
+                            }
+
+                        } else if (ErrorReniecEnum.HIT.getCode().equals(validacionResponse.getCodigoErrorReniec())) {
+                            showResult();
                         }
-
-                    } else if (ErrorReniecEnum.HIT.getCode().equals(validacionResponse.getObjeto().getCodigoErrorReniec())) {
-                        showResult();
+                    } else {
+                        Log.e(LOG_TAG, "getMejoresHuellas.onResponse() -> Ocurrió un error en VALIDATE FINGERPRINT");
+                        closeDialog(Boolean.FALSE);
+                        showInfoDialog("ERROR",
+                            "Ocurrió un error durante la validación de la huella",
+                            (dialog, which) -> finish());
                     }
 
+
                 } else {
-                    Log.e(LOG_TAG, "validateCapture.onResponse() -> Ocurrió un error al obtener la respuesta del servicio.");
+                    Log.e(LOG_TAG, "validateFingerprint -> Ocurrió un error durante la validación de huella.");
                     closeDialog(Boolean.FALSE);
+                    showInfoDialog("ERROR",
+                        "Ocurrió un error durante la validación de la huella",
+                        (dialog, which) -> finish());
                 }
 
             }
 
             @Override
-            public void onFailure(Call<CommonResponseDTO> call, Throwable t) {
+            public void onFailure(Call<CommonResponse> call, Throwable t) {
                 Log.e(LOG_TAG, "validateCapture.onFailure() -> Falló la respuesta del servidor.");
                 closeDialog(Boolean.FALSE);
+                showInfoDialog("ERROR",
+                    "Ocurrió un error durante la validación de la huella",
+                    (dialog, which) -> finish());
             }
         });
-
-
-        /*
-
-
-        if (dataBiometrica.getCalidadBiometrica() != null && requestReniec.getNumeroSerieDispositivo() != null && requestReniec.getBase64() != null) {
-
-            verificarIdentidadReniec.envioDatosDactilarReniec(requestReniec).enqueue(new Callback<ResponseReniec>() {
-                @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
-                @Override
-                public void onResponse(Call<ResponseReniec> call, Response<ResponseReniec> response) {
-                    ResponseReniec responseReniec = response.body();
-                    if (response.isSuccessful()) {
-                        Log.i(TAG, "-------contador de intentos  --------" + intentos);
-
-                        System.out.println("Dato: " + object.toString());
-
-                        if (object.getCodigoErrorReniec() == 70006) {
-                            System.out.println("Dato: " + object.toString());
-                            System.out.println("DNI " + object.getNumeroDocumento());
-
-                            System.out.println("nombreCompleto " + "Juanjo");
-
-                            System.out.println("codRspta " + String.valueOf(object.getCodigoError()));
-                            System.out.println("desRspta " + object.getDescripcionError());
-                            System.out.println("codReniec " + String.valueOf(object.getCodigoErrorReniec()));
-                            System.out.println("desReniec " + object.getDescripcionErrorReniec());
-                            System.out.println("tokenReniec " + object.getToken());
-
-                            consultaDatos();
-
-                            db.cambiarEstado(valor, "HIT");
-
-                            if (intentos == 3) {
-                                intentos++;
-                            }
-
-                        } else if (object.getCodigoErrorReniec() == 70007) {
-                            if (intentos < 3) {
-                                intentos++;
-
-
-                                SweetAlertDialog a = new SweetAlertDialog(mContext, SweetAlertDialog.ERROR_TYPE);
-                                a.setCancelable(false);
-                                a.setCanceledOnTouchOutside(false);
-                                a.setTitle("¡Oh, no!");
-                                a.setContentText("La persona no ha sido identificada(NO HIT)" +
-                                        "\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t" +
-                                        "\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t" +
-                                        "¿ Desea realizar otro intento ?");
-                                a.setConfirmText("Si");
-                                a.setCancelText("Regresar");
-                                a.setConfirmButtonTextColor(Color.WHITE);
-                                a.setConfirmButtonBackgroundColor(getResources().getColor(R.color.bg_success));
-                                a.setCancelButtonTextColor(Color.WHITE);
-                                a.setCancelButtonBackgroundColor(getResources().getColor(R.color.bg_danger));
-                                a.setConfirmClickListener(new SweetAlertDialog.OnSweetClickListener() {
-                                    @Override
-                                    public void onClick(SweetAlertDialog sDialog) {
-
-                                        sDialog.dismiss();
-
-                                        if (SessionConfig.getInstance().getIntentosXManos() == 1) {
-
-                                            fingerprintImageView.setImageDrawable(null);
-                                        } else if (SessionConfig.getInstance().getIntentosXManos() == 2) {
-
-                                            fingerprintImageView.setImageDrawable(null);
-                                        }
-                                    }
-                                });
-                                a.setCancelClickListener(new SweetAlertDialog.OnSweetClickListener() {
-                                    @Override
-                                    public void onClick(SweetAlertDialog sweetAlertDialog) {
-                                        sweetAlertDialog.dismiss();
-                                        intentos = 0;
-                                        SessionConfig.getInstance().setIntentosXManos(1);
-
-                                    }
-                                });
-                                a.show();
-                            } else if (intentos > 2) {
-
-                                System.out.println("DNI "+ object.getNumeroDocumento());
-
-                                System.out.println("nombreCompleto "+ "Juanjo");
-
-                                System.out.println("codRspta " + String.valueOf(object.getCodigoError()));
-                                System.out.println("desRspta " + object.getDescripcionError());
-                                System.out.println("codReniec " + String.valueOf(object.getCodigoErrorReniec()));
-                                System.out.println("desReniec " + object.getDescripcionErrorReniec());
-                                System.out.println("tokenReniec " + object.getToken());
-                                Log.i(TAG, "----------intentos por manos realizadas----" + SessionConfig.getInstance().getIntentosXManos() + object.getToken());
-
-                            }
-                        } else {
-                            SweetAlertDialog a = new SweetAlertDialog(mContext, SweetAlertDialog.ERROR_TYPE);
-                            a.setCancelable(false);
-                            a.setCanceledOnTouchOutside(false);
-                            a.setTitleText("¡Error en la verificación! Código N°: " + object.getCodigoErrorReniec());
-                            a.setConfirmText("Ok");
-                            a.setConfirmButtonTextColor(Color.WHITE);
-                            a.setConfirmButtonBackgroundColor(Color.RED);
-                            a.setContentText("Concepto del error: " + object.getDescripcionErrorReniec());
-                            a.setConfirmClickListener(new SweetAlertDialog.OnSweetClickListener() {
-                                @Override
-                                public void onClick(SweetAlertDialog sDialog) {
-                                    sDialog.dismiss();
-
-                                }
-                            });
-                            a.show();
-                        }
-                    }
-                }
-
-                @Override
-                public void onFailure(Call<ResponseReniec> call, Throwable t) {
-
-                    Log.i("MAVERICK ", "-------Funciono A malS --------");
-                    AlertDialog.Builder builder = new AlertDialog.Builder(CapturaHuellaActivity.this);
-                    builder.setMessage(
-                                    "Error en post")
-                            .setTitle("Resultado")
-                            .setCancelable(false)
-                            .setPositiveButton("Aceptar", new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    finish();
-                                }
-                            });
-                    AlertDialog alert = builder.create();
-                    alert.show();
-                }
-            });
-
-
-        } else {
-
-            SweetAlertDialog a = new SweetAlertDialog(mContext, SweetAlertDialog.ERROR_TYPE);
-            a.setCancelable(false);
-            a.setCanceledOnTouchOutside(false);
-            a.setTitleText("¡Oh, no!");
-            a.setConfirmText("Ok");
-            a.setConfirmButtonTextColor(Color.WHITE);
-            a.setConfirmButtonBackgroundColor(Color.RED);
-            a.setContentText("Los Datos para la verificacion de la persona estan incompletos , vuelva iniciar el proceso");
-            a.setConfirmClickListener(new SweetAlertDialog.OnSweetClickListener() {
-                @Override
-                public void onClick(SweetAlertDialog sDialog) {
-                    sDialog.dismiss();
-                    finish();
-                }
-            });
-            a.show();
-
-        }
-
-         */
     }
 
     private void deteccionHuellero() {

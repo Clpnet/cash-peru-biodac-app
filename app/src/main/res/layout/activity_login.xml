@@ -63,6 +63,7 @@
             android:orientation="vertical"
             android:paddingStart="20dp"
             android:paddingEnd="20dp"
+            android:visibility="gone"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/txtPrincipal">
@@ -142,6 +143,8 @@
                 android:paddingStart="30dp"
                 android:paddingEnd="30dp"
                 android:text="@string/btn_ingresar_desc"
+                android:clickable="false"
+                android:enabled="false"
                 android:textColor="@color/white" />
 
         </FrameLayout>
@@ -149,8 +152,8 @@
         <Button
             android:id="@+id/btnMicrosoftLogin"
             android:layout_width="wrap_content"
-            android:layout_height="32dp"
-            android:layout_marginTop="15dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
             android:background="@drawable/microsft_login_button"
             android:drawableStart="@drawable/ic_microsoft_24"
             android:paddingStart="10dp"

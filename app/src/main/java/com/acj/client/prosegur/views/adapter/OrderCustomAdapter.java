@@ -1,4 +1,4 @@
-package com.acj.client.prosegur.views.config;
+package com.acj.client.prosegur.views.adapter;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -52,13 +52,6 @@ public class OrderCustomAdapter extends RecyclerView.Adapter<OrderCustomAdapter.
 				holder.txtOrderType.setText(orden.getTipoOrden());
 				holder.txtCardType.setText(orden.getTipoTarjeta());
 				holder.txtDocumentNumber.setText(Util.obfuscateKeep(orden.getNumeroDocumento(), 4, Boolean.TRUE));
-
-				int numberIntent = orden.getOrdenesIntento().isEmpty()
-						? (orden.getOrdenesIntento().size() + 1) : orden.getOrdenesIntento().size();
-
-				holder.txtNumberIntent.setText((numberIntent > 0)
-						? String.format(context.getString(R.string.txt_number_intent_desc), String.valueOf(numberIntent))
-						: StringUtils.EMPTY);
 				holder.txtDeliveryDate.setText(orden.getFechaEntrega());
 
 				showDynamicFields(holder, orden);
@@ -142,7 +135,14 @@ public class OrderCustomAdapter extends RecyclerView.Adapter<OrderCustomAdapter.
 					holder.lblLastIntentDate.setVisibility((hasIntent) ? View.VISIBLE : View.GONE);
 					holder.txtLastIntentDate.setVisibility((hasIntent) ? View.VISIBLE : View.GONE);
 			} else {
-					holder.txtNumberIntent.setVisibility(View.VISIBLE);
+					int numberIntent = orden.getOrdenesIntento().size();
+
+					holder.txtNumberIntent.setText((numberIntent > 0)
+							? String.format(context.getString(R.string.txt_number_intent_desc), String.valueOf(numberIntent))
+							: StringUtils.EMPTY);
+
+					holder.txtNumberIntent.setVisibility((orden.getOrdenesIntento().isEmpty())
+							? View.GONE : View.VISIBLE);
 			}
 		}
 

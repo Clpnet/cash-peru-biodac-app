@@ -1,5 +1,7 @@
 package com.acj.client.prosegur.model.dto.orders;
 
+import java.io.Serializable;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -13,7 +15,7 @@ import lombok.ToString;
 @NoArgsConstructor
 @Builder
 @ToString
-public class OrderIntentDTO {
+public class OrderIntentDTO implements Serializable {
 
 		private Integer idOrdenIntento;
 		private String numero;

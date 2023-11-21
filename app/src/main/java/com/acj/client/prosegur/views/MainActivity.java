@@ -2,17 +2,22 @@ package com.acj.client.prosegur.views;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 
 import com.acj.client.prosegur.R;
 import com.acj.client.prosegur.api.ApiService.OrderService;
+import com.acj.client.prosegur.api.ApiService.UsuarioService;
 import com.acj.client.prosegur.api.ApiUtils;
-import com.acj.client.prosegur.model.common.OrderResponse;
+import com.acj.client.prosegur.databinding.ActivityMainBinding;
+import com.acj.client.prosegur.model.common.CommonResponse;
 import com.acj.client.prosegur.model.constant.OrderStateEnum;
 import com.acj.client.prosegur.model.constant.StatusResponseEnum;
 import com.acj.client.prosegur.model.dto.orders.OrderDTO;
-import com.acj.client.prosegur.databinding.ActivityMainBinding;
 import com.acj.client.prosegur.config.SessionConfig;
+import com.acj.client.prosegur.model.dto.user.UserDetailsDTO;
+import com.acj.client.prosegur.util.Constants;
+import com.acj.client.prosegur.util.Util;
 import com.acj.client.prosegur.views.dialog.LoadingDialogFragment;
 import com.acj.client.prosegur.views.login.LoginActivity;
 import com.google.android.material.appbar.AppBarLayout;
@@ -34,16 +39,19 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
+import cn.pedant.SweetAlert.SweetAlertDialog;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+import retrofit2.Retrofit;
 
 import static com.acj.client.prosegur.util.Constants.LOADING_DIALOG_TAG;
+import static com.acj.client.prosegur.util.Util.killSessionOnMicrosoft;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -64,11 +72,15 @@ public class MainActivity extends AppCompatActivity {
 		private TextView txtCurrentState;
 		private EditText etxSearchBox;
 
-		private Context context;
+		private Context mContext;
 
 		private Boolean isDataLoaded;
 
 		private LoadingDialogFragment dialogHandler;
+
+		// Services
+		private UsuarioService usuarioService;
+		private OrderService orderService;
 
 		@Override
 		protected void onCreate(Bundle savedInstanceState) {
@@ -77,6 +89,10 @@ public class MainActivity extends AppCompatActivity {
 				binding = ActivityMainBinding.inflate(getLayoutInflater());
 
 				setContentView(R.layout.activity_main);
+
+				Retrofit retrofit = ApiUtils.getApi(mContext);
+				usuarioService = retrofit.create(UsuarioService.class);
+				orderService = retrofit.create(OrderService.class);
 
 				initViewElements();
 		}
@@ -92,31 +108,40 @@ public class MainActivity extends AppCompatActivity {
 
 				dialogHandler.show(getSupportFragmentManager(), LOADING_DIALOG_TAG);
 
-				OrderService orderService = ApiUtils.getApi().create(OrderService.class);
-				Call<OrderResponse> readOrders = orderService.findAllOrders("12345");
-				readOrders.enqueue(new Callback<OrderResponse>() {
-						@Override
-						public void onResponse(@NonNull Call<OrderResponse> call, @NonNull Response<OrderResponse> response) {
-								if (response.isSuccessful() && StatusResponseEnum.SUCCESS.getCode().equals(response.body().getCabecera().getCodigo())) {
-										Log.i(LOG_TAG, "Respuesta exitosa del listado de ordeners. Response [" + response.body().getObjeto() + "]");
+				if (Objects.isNull(SessionConfig.getInstance().getUserDetails())) {
+					Call<CommonResponse> usuarioResponse = usuarioService.getUserDetails(SessionConfig.getInstance().getAccessToken(),
+							Constants.APP_CHANNEL,
+							SessionConfig.getInstance().getMAccount().getUsername());
+					usuarioResponse.enqueue(new Callback<CommonResponse>() {
+							@Override
+							public void onResponse(Call<CommonResponse> call, Response<CommonResponse> response) {
+									if (response.isSuccessful() && StatusResponseEnum.SUCCESS.getCode().equals(response.body().getCabecera().getCodigo())) {
+											Log.i(LOG_TAG, "Respuesta exitosa de los detalles del usuario. Response [" + response.body().getObjeto() + "]");
 
-										updateOrderData(response.body());
-										refreshContent();
+											SessionConfig.getInstance().setUserDetails(Util
+													.jsonToClass(response.body().getObjeto(), UserDetailsDTO.class));
 
-								} else {
-										Log.e(LOG_TAG, "onResponse() -> Ocurrió un error en el GET ORDERS");
-										closeDialog(Boolean.FALSE);
-								}
-						}
+											findOrders();
+									} else {
+											Log.e(LOG_TAG, "onResponse() -> Ocurrió un error en el GET USER DETAILS");
+											closeDialog(Boolean.FALSE);
+											showErrorDialog("Ocurrió un error en la consulta \n" +
+													"de datos de sesión del usuario \n");
+									}
+							}
 
-						@Override
-						public void onFailure(@NonNull Call<OrderResponse> call, @NonNull Throwable t) {
-								Log.e(LOG_TAG, "onFailure() -> Ocurrió un error en el GET ORDERS. [" + t + "]");
-								closeDialog(Boolean.FALSE);
-								t.printStackTrace();
-						}
-				});
-
+							@Override
+							public void onFailure(Call<CommonResponse> call, Throwable t) {
+									Log.e(LOG_TAG, "onFailure() -> Ocurrió un error en el GET USER DETAILS. [" + t + "]");
+									closeDialog(Boolean.FALSE);
+									showErrorDialog("Ocurrió un error en la consulta \n" +
+											"de datos de sesión del usuario");
+									t.printStackTrace();
+							}
+					});
+				} else {
+						findOrders();
+				}
 		}
 
 		@Override
@@ -124,6 +149,40 @@ public class MainActivity extends AppCompatActivity {
 				super.onStop();
 				isDataLoaded = Boolean.FALSE;
 				closeDialog(Boolean.FALSE);
+		}
+
+		private void findOrders() {
+				Log.i(LOG_TAG, "Codigo Interno [" + SessionConfig.getInstance().getUserDetails().getCodigoInterno() + "]");
+				Call<CommonResponse> readOrders = orderService.findAllOrders(SessionConfig.getInstance().getUserDetails().getCodigoInterno());
+				readOrders.enqueue(new Callback<CommonResponse>() {
+						@Override
+						public void onResponse(@NonNull Call<CommonResponse> call, @NonNull Response<CommonResponse> response) {
+								if (response.isSuccessful()) {
+										if (StatusResponseEnum.SUCCESS.getCode().equals(response.body().getCabecera().getCodigo())) {
+												Log.i(LOG_TAG, "Respuesta exitosa del listado de ordeners. Response [" + response.body().getObjeto() + "]");
+
+												updateOrderData(response.body());
+												refreshContent();
+										} else {
+												Log.e(LOG_TAG, "onResponse() -> Error controlado en GET ORDERS. Codigo " + response.body().getCabecera().getCodigo());
+										}
+								} else {
+										Log.e(LOG_TAG, "onResponse() -> Ocurrió un error en el GET ORDERS");
+										closeDialog(Boolean.FALSE);
+										showErrorDialog("Ocurrió un error al consultar \n" +
+												"las ordenes para su usuario");
+								}
+						}
+
+						@Override
+						public void onFailure(@NonNull Call<CommonResponse> call, @NonNull Throwable t) {
+								Log.e(LOG_TAG, "onFailure() -> Ocurrió un error en el GET ORDERS. [" + t + "]");
+								closeDialog(Boolean.FALSE);
+								showErrorDialog("Ocurrió un error en la consulta \n" +
+										"de ordenes del usuario");
+								t.printStackTrace();
+						}
+				});
 		}
 
 		private void closeDialog(Boolean delay) {
@@ -144,10 +203,10 @@ public class MainActivity extends AppCompatActivity {
 				txtCurrentState = findViewById(R.id.txtOrderStates);
 				etxSearchBox = findViewById(R.id.searchEditText);
 
-				context = this;
+				mContext = this;
 
 				// Render content on fragment
-				OrderFragment orderFragment = new OrderFragment(context, new ArrayList<>());
+				OrderFragment orderFragment = new OrderFragment(mContext, new ArrayList<>());
 				getSupportFragmentManager()
 						.beginTransaction().replace(R.id.container, orderFragment, FRAGMENT_TAG).commit();
 
@@ -204,24 +263,26 @@ public class MainActivity extends AppCompatActivity {
 				}
 		}
 
-		private void updateOrderData(OrderResponse response) {
+		private void updateOrderData(CommonResponse response) {
 				Log.i(LOG_TAG, "Actualizado listado de ordenes");
 
 				SessionConfig session = SessionConfig.getInstance();
+				session.setCommonResponse(response);
 
-				session.setOrderResponse(response);
+				List<OrderDTO> orders = Arrays.asList(Util.jsonToClass(response.getObjeto(), OrderDTO[].class));
+				session.setAllOrders(orders);
 
 				if (Objects.nonNull(session.getLastSelectedOption())) {
 						updateVisibleContent(session.getLastSelectedOption(), null, Boolean.FALSE);
 				} else {
-						session.setVisibleList(response.getObjeto());
+						session.setVisibleList(orders);
 				}
 
 				int totalPending = 0;
 				int totalHit = 0;
 				int totalNoHit = 0;
 
-				for (OrderDTO orderDTO : response.getObjeto()) {
+				for (OrderDTO orderDTO : orders) {
 						switch (orderDTO.getEstadoEntrega()) {
 								case C:
 										++totalPending;
@@ -247,7 +308,7 @@ public class MainActivity extends AppCompatActivity {
 		}
 
 		private void updateVisibleContent(OrderStateEnum stateEnum, String orderNumber, Boolean refresh) {
-				List<OrderDTO> allOrders = SessionConfig.getInstance().getOrderResponse().getObjeto();
+				List<OrderDTO> allOrders = SessionConfig.getInstance().getAllOrders();
 				List<OrderDTO> resultList = new ArrayList<>();
 
 				if (Objects.nonNull(stateEnum)) {
@@ -274,6 +335,23 @@ public class MainActivity extends AppCompatActivity {
 				if (refresh) refreshContent();
 		}
 
+		private void showErrorDialog(String content) {
+				SweetAlertDialog a = new SweetAlertDialog(mContext, SweetAlertDialog.ERROR_TYPE);
+				a.setCancelable(false);
+				a.setCanceledOnTouchOutside(false);
+				a.setTitleText("ERROR");
+				a.setConfirmText("OK");
+				a.setConfirmButtonTextColor(Color.WHITE);
+				a.setConfirmButtonBackgroundColor(Color.RED);
+				a.setContentText(content);
+				a.setConfirmClickListener(sDialog -> {
+						sDialog.dismiss();
+						exit();
+						sendToLogin();
+				});
+				a.show();
+		}
+
 		public boolean optionItemSelected(MenuItem item) {
 				int id = item.getItemId();
 
@@ -294,14 +372,23 @@ public class MainActivity extends AppCompatActivity {
 								updateVisibleContent(OrderStateEnum.N, null, Boolean.TRUE);
 								break;
 						case R.id.opt_exit:
-								Intent intentLogin = new Intent(this, LoginActivity.class);
-								startActivity(intentLogin);
-								SessionConfig.closeSession();
-								finishAffinity();
+								exit();
 								break;
 				}
 
 				return super.onOptionsItemSelected(item);
+		}
+
+		public void exit() {
+				killSessionOnMicrosoft(); // SERGIO SICCHA -> VALIDAR SI AL MORIR APLICACION DEBE CERRAR SESION DE AZURE
+				SessionConfig.closeSession();
+				sendToLogin();
+		}
+
+		public void sendToLogin() {
+				Intent intentLogin = new Intent(this, LoginActivity.class);
+				startActivity(intentLogin);
+				finishAffinity();
 		}
 
 }

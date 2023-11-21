@@ -1,6 +1,6 @@
 package com.acj.client.prosegur.api.ApiService;
 
-import com.acj.client.prosegur.model.dto.biometric.CommonResponseDTO;
+import com.acj.client.prosegur.model.common.CommonResponse;
 import com.acj.client.prosegur.model.dto.biometric.RequestValidateDTO;
 
 import retrofit2.Call;
@@ -14,9 +14,9 @@ public interface DatoBiometricoService {
     String BASE_PATH = "biometrico";
 
     @GET(BASE_PATH + "/mejores-huellas/{dni}")
-    Call<CommonResponseDTO> findBetterFootprints(@Path("dni") String documentNumber);
+    Call<CommonResponse> findBetterFootprints(@Path("dni") String documentNumber);
 
     @POST(BASE_PATH + "/captura")
-    Call<CommonResponseDTO> validateCapture(@Body RequestValidateDTO request);
+    Call<CommonResponse> validateCapture(@Body RequestValidateDTO request);
 
 }

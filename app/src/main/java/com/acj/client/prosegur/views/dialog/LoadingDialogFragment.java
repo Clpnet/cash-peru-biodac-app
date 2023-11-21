@@ -2,6 +2,7 @@ package com.acj.client.prosegur.views.dialog;
 
 import android.app.Activity;
 import android.app.Dialog;
+import android.content.DialogInterface;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
@@ -49,6 +50,8 @@ public class LoadingDialogFragment extends DialogFragment {
 				return createdDialog;
 		}
 
-
-
+		@Override
+		public void onCancel(@NonNull DialogInterface dialog) {
+				super.onCancel(dialog);
+		}
 }

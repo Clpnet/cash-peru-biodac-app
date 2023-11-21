@@ -15,9 +15,9 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.acj.client.prosegur.R;
 import com.acj.client.prosegur.model.constant.OrderStateEnum;
 import com.acj.client.prosegur.model.dto.orders.OrderDTO;
-import com.acj.client.prosegur.views.config.OrderCustomAdapter;
+import com.acj.client.prosegur.views.adapter.OrderCustomAdapter;
 import com.acj.client.prosegur.model.constant.EnumExtra;
-import com.acj.client.prosegur.views.adapter.CapturaHuellaActivity;
+import com.acj.client.prosegur.views.captura.CapturaHuellaActivity;
 
 import java.util.List;
 
@@ -63,6 +63,8 @@ public class OrderFragment extends Fragment implements OrderCustomAdapter.OnItem
     @Override
     public void onItemClick(int position) {
         OrderDTO currentOrder = orders.get(position);
+
+        Log.i(LOG_TAG, "Orden [" + currentOrder.toString() + "]");
 
         Log.i(LOG_TAG, "Validando proceso de captura para la orden [" + currentOrder.getCodigoOrden() + "]");
 
