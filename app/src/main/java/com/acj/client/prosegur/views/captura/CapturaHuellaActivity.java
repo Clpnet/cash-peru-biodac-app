@@ -73,6 +73,7 @@ public class CapturaHuellaActivity extends AppCompatActivity {
     private TextView txtOrderType;
     private TextView txtCardType;
     private TextView txtDocumentNumber;
+    private TextView txtNumberIntent;
     private TextView txtDate;
 
     // Imagenes de las huellas
@@ -110,6 +111,7 @@ public class CapturaHuellaActivity extends AppCompatActivity {
     private OrderDTO currentOrder;
     private ResponseObjectReniec mejoresHuellasResponse;
     private ResponseObjectReniec validacionResponse;
+    private Integer numberIntent;
 
     private Context mContext;
 
@@ -138,6 +140,7 @@ public class CapturaHuellaActivity extends AppCompatActivity {
         // Estableciendo datos de la orden actual
         Intent intent = getIntent();
         currentOrder = (OrderDTO) intent.getSerializableExtra(EnumExtra.CURRENT_ORDER.toString());
+        numberIntent = currentOrder.getOrdenesIntento().size();
 
         setOrderContent();
 
@@ -164,6 +167,7 @@ public class CapturaHuellaActivity extends AppCompatActivity {
         txtOrderType = findViewById(R.id.txtCOrderType);
         txtCardType = findViewById(R.id.txtCCardDesc);
         txtDocumentNumber = findViewById(R.id.txtCDocumentNumber);
+        txtNumberIntent = findViewById(R.id.txtCNumberIntent);
         txtDate = findViewById(R.id.txtCDate);
         lblHuellaIzq = findViewById(R.id.lblHuellaIzq);
         lblHuellaDer = findViewById(R.id.lblHuellaDer);
@@ -228,11 +232,13 @@ public class CapturaHuellaActivity extends AppCompatActivity {
     }
 
     private void setOrderContent() {
-        txtOrderNumber.setText(currentOrder.getCodigoOrden());
+        txtOrderNumber.setText(currentOrder.getCodigoOperacion());
         txtOrderType.setText(currentOrder.getTipoOrden());
         txtCardType.setText(currentOrder.getTipoTarjeta());
         txtDocumentNumber.setText(Util.obfuscateKeep(currentOrder.getNumeroDocumento(), 4, Boolean.TRUE));
         txtDate.setText(currentOrder.getFechaEntrega());
+        txtNumberIntent.setText(String.format(mContext.getString(R.string.txt_number_intent_desc), numberIntent.toString()));
+        if (numberIntent != 0) txtNumberIntent.setVisibility(View.VISIBLE);
     }
 
     private void updateCaptureButtonState(Boolean enabled) {
@@ -247,22 +253,30 @@ public class CapturaHuellaActivity extends AppCompatActivity {
         datoBiometricoService.findBetterFootprints(currentOrder.getNumeroDocumento()).enqueue(new Callback<CommonResponse>() {
             @Override
             public void onResponse(Call<CommonResponse> call, Response<CommonResponse> response) {
-                if (response.isSuccessful() && StatusResponseEnum.SUCCESS.getCode().equals(response.body().getCabecera().getCodigo())) {
-                    mejoresHuellasResponse = Util.jsonToClass(response.body().getObjeto(), ResponseObjectReniec.class);
+                if (response.isSuccessful()) {
+                    if(StatusResponseEnum.SUCCESS.getCode().equals(response.body().getCabecera().getCodigo())) {
+                        mejoresHuellasResponse = Util.jsonToClass(response.body().getObjeto(), ResponseObjectReniec.class);
 
-                    Log.i(LOG_TAG, "getMejoresHuellas() -> Respuesta exitosa en la busqueda de mejores huellas. " +
-                        "Response [" + mejoresHuellasResponse + "]");
+                        Log.i(LOG_TAG, "getMejoresHuellas.onResponse() -> Respuesta exitosa en la busqueda de mejores huellas. " +
+                            "Response [" + mejoresHuellasResponse + "]");
 
-                    lblHuellaIzq.setText(mejoresHuellasResponse.getMejorHuellaIzquierdaDesc());
-                    lblHuellaDer.setText(mejoresHuellasResponse.getMejorHuellaDerechaDesc());
+                        lblHuellaIzq.setText(mejoresHuellasResponse.getMejorHuellaIzquierdaDesc());
+                        lblHuellaDer.setText(mejoresHuellasResponse.getMejorHuellaDerechaDesc());
 
-                    imgManoIzq.setImageResource(FingerEnum.getFinderByCod(mejoresHuellasResponse.getMejorHuellaIzquierda()).getImage());
-                    imgManoDer.setImageResource(FingerEnum.getFinderByCod(mejoresHuellasResponse.getMejorHuellaDerecha()).getImage());
+                        imgManoIzq.setImageResource(FingerEnum.getFinderByCod(mejoresHuellasResponse.getMejorHuellaIzquierda()).getImage());
+                        imgManoDer.setImageResource(FingerEnum.getFinderByCod(mejoresHuellasResponse.getMejorHuellaDerecha()).getImage());
 
-                    updateCaptureButtonState(Boolean.TRUE);
+                        updateCaptureButtonState(Boolean.TRUE);
 
-                    closeDialog(Boolean.TRUE);
+                        closeDialog(Boolean.TRUE);
 
+                    } else {
+                        Log.e(LOG_TAG, "getMejoresHuellas.onResponse() -> No Success Code -> Ocurrió un error en el GET USER DETAILS");
+                        closeDialog(Boolean.FALSE);
+                        /*showErrorDialog("Ocurrió un error en la consulta \n" +
+                            "de datos de sesión del usuario \n" +
+                            "Mensaje: " + response.body().getCabecera().getDescripcion());*/
+                    }
                 } else {
                     Log.e(LOG_TAG, "getMejoresHuellas.onResponse() -> Ocurrió un error en el GET MEJORES HUELLAS");
                     closeDialog(Boolean.FALSE);
@@ -394,7 +408,7 @@ public class CapturaHuellaActivity extends AppCompatActivity {
     }
 
     public void exit() {
-        killSessionOnMicrosoft(); // SERGIO SICCHA -> VALIDAR SI AL MORIR APLICACION DEBE CERRAR SESION DE AZURE
+        killSessionOnMicrosoft();
         SessionConfig.closeSession();
 
         Intent intentLogin = new Intent(this, LoginActivity.class);
@@ -424,8 +438,6 @@ public class CapturaHuellaActivity extends AppCompatActivity {
                 (dialog, which) -> finish());
             return;
         }
-
-        Log.i(LOG_TAG, "validateFingerprint() -> Captured Template [" + fingerPrintBytes + "]");
 
         RequestValidateDTO requestValidateDTO = new RequestValidateDTO();
         requestValidateDTO.setIdOrdenDetalle(currentOrder.getIdOrdenDetalle());
@@ -457,6 +469,12 @@ public class CapturaHuellaActivity extends AppCompatActivity {
 
                             // SERGIO SICCHA -> PARAMETRIZAR INTENTOS
                             if (validacionResponse.getTotalIntentos() < 3) {
+
+                                ++numberIntent;
+                                txtNumberIntent.setText(String.format(mContext.getString(R.string.txt_number_intent_desc), numberIntent.toString()));
+                                if (View.INVISIBLE == txtNumberIntent.getVisibility())
+                                    txtNumberIntent.setVisibility(View.VISIBLE);
+
                                 dialogBuilder
                                     .setTitle("AVISO")
                                     .setMessage("Validación Incorrecta\n¿Desea reintentar?")
@@ -464,6 +482,7 @@ public class CapturaHuellaActivity extends AppCompatActivity {
                                     .setPositiveButton("SI", (dialog, which) -> updateCaptureButtonState(Boolean.TRUE))
                                     .setNegativeButton("NO", (dialog, which) -> finish())
                                     .create().show();
+
                             } else {
                                 showInfoDialog("Validación Incorrecta",
                                     "Ha agotado el total de intentos permitidos\npara realizar la validación dactilar",
@@ -474,16 +493,17 @@ public class CapturaHuellaActivity extends AppCompatActivity {
                             showResult();
                         }
                     } else {
-                        Log.e(LOG_TAG, "getMejoresHuellas.onResponse() -> Ocurrió un error en VALIDATE FINGERPRINT");
+                        Log.e(LOG_TAG, "validateCapture.onResponse() -> No Success Code -> Ocurrió un error en VALIDATE FINGERPRINT");
                         closeDialog(Boolean.FALSE);
                         showInfoDialog("ERROR",
-                            "Ocurrió un error durante la validación de la huella",
+                            "Ocurrió un error durante la validación de la huella \n" +
+                                "Mensaje: " + response.body().getCabecera().getDescripcion(),
                             (dialog, which) -> finish());
                     }
 
 
                 } else {
-                    Log.e(LOG_TAG, "validateFingerprint -> Ocurrió un error durante la validación de huella.");
+                    Log.e(LOG_TAG, "validateCapture -> Ocurrió un error durante la validación de huella.");
                     closeDialog(Boolean.FALSE);
                     showInfoDialog("ERROR",
                         "Ocurrió un error durante la validación de la huella",

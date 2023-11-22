@@ -1,5 +1,7 @@
 package com.acj.client.prosegur.model.dto.user;
 
+import java.util.List;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -23,8 +25,8 @@ public class UserDetailsDTO {
 	private String correo;
 	private String numeroDocumento;
 	private PerfilDTO perfil;
-	private String movil;
-	private String lector;
+	private List<SerialNumberDTO> movil;
+	private List<SerialNumberDTO> lector;
 	private String token;
 
 }

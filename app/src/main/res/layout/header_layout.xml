@@ -28,6 +28,17 @@
                 android:src="@drawable/ic_baseline_menu_24"
                 android:contentDescription="@string/ic_dropdown_desc"/>
 
+            <TextView
+                android:id="@+id/txtWelcome"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="30dp"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:textColor="@color/black"
+                android:text="@string/txt_appbar_welcome_desc"
+                android:visibility="invisible"/>
+
             <ImageView
                 android:id="@+id/prosegur_icon"
                 android:layout_width="30dp"

@@ -7,6 +7,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -20,12 +21,15 @@ import com.acj.client.prosegur.model.constant.EnumExtra;
 import com.acj.client.prosegur.views.captura.CapturaHuellaActivity;
 
 import java.util.List;
+import java.util.Objects;
 
 public class OrderFragment extends Fragment implements OrderCustomAdapter.OnItemClickListener {
 
     private final String LOG_TAG = OrderFragment.class.getSimpleName();
 
+    private TextView txtEmptyList;
     private RecyclerView recyclerView;
+
     private Context context;
 
     private List<OrderDTO> orders;
@@ -37,9 +41,19 @@ public class OrderFragment extends Fragment implements OrderCustomAdapter.OnItem
         this.orders = orders;
     }
 
-    public void refreshContent(List<OrderDTO> newOrders) {
+    public void refreshContent(List<OrderDTO> newOrders, Boolean isDataFromBack) {
         this.orders = newOrders;
-        this.recyclerView.setAdapter(new OrderCustomAdapter(orders, context, this));
+
+        txtEmptyList.setText((isDataFromBack)
+            ? context.getString(R.string.txt_empty_order_list_desc)
+            : context.getString(R.string.txt_orders_not_found));
+
+        this.txtEmptyList.setVisibility((this.orders.isEmpty()) ? View.VISIBLE : View.GONE );
+        this.recyclerView.setVisibility((this.orders.isEmpty()) ? View.GONE : View.VISIBLE );
+
+        OrderCustomAdapter currentAdapter = (OrderCustomAdapter) this.recyclerView.getAdapter();
+
+        if (Objects.nonNull(currentAdapter)) currentAdapter.changeOrders(this.orders);
     }
 
     @Override
@@ -47,6 +61,7 @@ public class OrderFragment extends Fragment implements OrderCustomAdapter.OnItem
 
         View view = inflater.inflate(R.layout.fragment_order, container, false);
 
+        txtEmptyList = view.findViewById(R.id.txtEmptyList);
         recyclerView = view.findViewById(R.id.recycler_view);
 
         LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
@@ -64,13 +79,11 @@ public class OrderFragment extends Fragment implements OrderCustomAdapter.OnItem
     public void onItemClick(int position) {
         OrderDTO currentOrder = orders.get(position);
 
-        Log.i(LOG_TAG, "Orden [" + currentOrder.toString() + "]");
-
-        Log.i(LOG_TAG, "Validando proceso de captura para la orden [" + currentOrder.getCodigoOrden() + "]");
+        Log.i(LOG_TAG, "Validando proceso de captura para la orden [" + currentOrder.getCodigoOperacion() + "]");
 
         if (OrderStateEnum.Constants.PENDING_CODE.equals(currentOrder.getEstadoEntrega().getCode()) ||
             (OrderStateEnum.Constants.NO_HIT_CODE.equals(currentOrder.getEstadoEntrega().getCode()) &&
-                currentOrder.getOrdenesIntento().size() < 2)) {
+                currentOrder.getOrdenesIntento().size() < 3)) {
             Log.i(LOG_TAG, "Inicando proceso de captura");
 
             if (!isClicked) {

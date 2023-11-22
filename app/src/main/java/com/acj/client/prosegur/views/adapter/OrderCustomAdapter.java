@@ -36,6 +36,11 @@ public class OrderCustomAdapter extends RecyclerView.Adapter<OrderCustomAdapter.
 				this.listener = listener;
 		}
 
+		public void changeOrders(List<OrderDTO> orderDTO) {
+				this.orderDTO = orderDTO;
+				notifyDataSetChanged();
+		}
+
 		@NonNull
 		@Override
 		public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -48,7 +53,7 @@ public class OrderCustomAdapter extends RecyclerView.Adapter<OrderCustomAdapter.
 		public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
 				OrderDTO orden = orderDTO.get(holder.getAdapterPosition());
 
-				holder.txtOrderNumber.setText(orden.getCodigoOrden());
+				holder.txtOrderNumber.setText(orden.getCodigoOperacion());
 				holder.txtOrderType.setText(orden.getTipoOrden());
 				holder.txtCardType.setText(orden.getTipoTarjeta());
 				holder.txtDocumentNumber.setText(Util.obfuscateKeep(orden.getNumeroDocumento(), 4, Boolean.TRUE));
@@ -125,24 +130,34 @@ public class OrderCustomAdapter extends RecyclerView.Adapter<OrderCustomAdapter.
 		private void showDynamicFields(ViewHolder holder, OrderDTO orden) {
 				OrderStateEnum currentState = orden.getEstadoEntrega();
 
+				holder.txtNumberIntent.setVisibility(View.GONE);
+				holder.lblLastIntentDate.setVisibility(View.GONE);
+				holder.txtLastIntentDate.setVisibility(View.GONE);
+				holder.txtValidatedState.setVisibility(View.GONE);
+
 			if (OrderStateEnum.Constants.HIT_CODE.equals(currentState.getCode())) {
 					holder.txtValidatedState.setVisibility(View.VISIBLE);
 			} else if (OrderStateEnum.Constants.NO_HIT_CODE.equals(currentState.getCode())) {
-					boolean hasIntent = !orden.getOrdenesIntento().isEmpty();
-					holder.txtLastIntentDate.setText( (hasIntent)
+					int numberIntent = orden.getOrdenesIntento().size();
+
+					holder.txtLastIntentDate.setText( (numberIntent != 0)
 							? orden.getOrdenesIntento().get(0).getFechaCreacion()
 							: StringUtils.EMPTY);
-					holder.lblLastIntentDate.setVisibility((hasIntent) ? View.VISIBLE : View.GONE);
-					holder.txtLastIntentDate.setVisibility((hasIntent) ? View.VISIBLE : View.GONE);
+					holder.lblLastIntentDate.setVisibility((numberIntent != 0) ? View.VISIBLE : View.GONE);
+					holder.txtLastIntentDate.setVisibility((numberIntent != 0) ? View.VISIBLE : View.GONE);
+
+					holder.txtNumberIntent.setText(String.format(context.getString(R.string.txt_card_number_intent_desc), String.valueOf(numberIntent)));
+
+					holder.txtNumberIntent.setVisibility(View.VISIBLE);
 			} else {
 					int numberIntent = orden.getOrdenesIntento().size();
 
 					holder.txtNumberIntent.setText((numberIntent > 0)
-							? String.format(context.getString(R.string.txt_number_intent_desc), String.valueOf(numberIntent))
+							? String.format(context.getString(R.string.txt_card_number_intent_desc), String.valueOf(numberIntent))
 							: StringUtils.EMPTY);
 
-					holder.txtNumberIntent.setVisibility((orden.getOrdenesIntento().isEmpty())
-							? View.GONE : View.VISIBLE);
+					/* holder.txtNumberIntent.setVisibility((orden.getOrdenesIntento().isEmpty())
+							? View.GONE : View.VISIBLE); */
 			}
 		}
 

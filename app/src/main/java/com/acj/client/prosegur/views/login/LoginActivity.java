@@ -1,7 +1,5 @@
 package com.acj.client.prosegur.views.login;
 
-import static com.acj.client.prosegur.util.Constants.LOADING_DIALOG_TAG;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -85,6 +83,8 @@ public class LoginActivity extends AppCompatActivity {
 
         mContext = this;
 
+        updateLoginButtonState(Boolean.FALSE);
+
         btnLogin.setOnClickListener(view -> {
             btnLogin.setClickable(Boolean.FALSE);
             btnLogin.setEnabled(Boolean.FALSE);
@@ -98,7 +98,7 @@ public class LoginActivity extends AppCompatActivity {
         btnLoginMicrosoft.setOnClickListener(view -> {
             updateLoginButtonState(Boolean.FALSE);
 
-            dialogHandler.show(getSupportFragmentManager(), LOADING_DIALOG_TAG);
+            // dialogHandler.show(getSupportFragmentManager(), LOADING_DIALOG_TAG);
 
             if (mSingleAccountApp == null) {
                 return;
@@ -125,7 +125,7 @@ public class LoginActivity extends AppCompatActivity {
             public void onSuccess(IAuthenticationResult authenticationResult) {
                 Log.i(LOG_TAG, "Autenticacion exitosa");
 
-                closeDialog(Boolean.FALSE);
+                // closeDialog(Boolean.FALSE);
 
                 SessionConfig.getInstance().setMAccount(authenticationResult.getAccount());
                 SessionConfig.getInstance().setAccessToken(authenticationResult.getAccessToken());
@@ -142,7 +142,7 @@ public class LoginActivity extends AppCompatActivity {
                 Log.e(LOG_TAG, "Authentication failed -> onError() : " + exception.toString());
 
                 updateLoginButtonState(Boolean.TRUE);
-                closeDialog(Boolean.FALSE);
+                // closeDialog(Boolean.FALSE);
 
                 if (exception instanceof MsalClientException) {
                     /* Exception inside MSAL, more info inside MsalError.java */
@@ -156,7 +156,7 @@ public class LoginActivity extends AppCompatActivity {
                 /* User canceled the authentication */
                 Log.e(LOG_TAG, "User cancelled login -> onCancel() ");
                 updateLoginButtonState(Boolean.TRUE);
-                closeDialog(Boolean.FALSE);
+                // closeDialog(Boolean.FALSE);
             }
         };
     }
@@ -205,7 +205,10 @@ public class LoginActivity extends AppCompatActivity {
         mSingleAccountApp.getCurrentAccountAsync(new ISingleAccountPublicClientApplication.CurrentAccountCallback() {
             @Override
             public void onAccountLoaded(@Nullable IAccount activeAccount) {
-                if (Objects.isNull(activeAccount)) return;
+                if (Objects.isNull(activeAccount)) {
+                    updateLoginButtonState(Boolean.TRUE);
+                    return;
+                }
 
                 Log.i(LOG_TAG, "Se encontro una sesion iniciada. Cargando cuenta...");
                 SessionConfig.getInstance().setMAccount(activeAccount);

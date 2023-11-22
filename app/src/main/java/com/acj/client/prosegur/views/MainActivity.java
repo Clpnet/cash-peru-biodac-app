@@ -34,12 +34,14 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -64,6 +66,7 @@ public class MainActivity extends AppCompatActivity {
 		private ActivityMainBinding binding;
 
 		private ImageView menuIcon;
+		private TextView txtWelcome;
 		private PopupMenu orderMenu;
 		private MenuItem pendingOption;
 		private MenuItem hitOption;
@@ -115,18 +118,36 @@ public class MainActivity extends AppCompatActivity {
 					usuarioResponse.enqueue(new Callback<CommonResponse>() {
 							@Override
 							public void onResponse(Call<CommonResponse> call, Response<CommonResponse> response) {
-									if (response.isSuccessful() && StatusResponseEnum.SUCCESS.getCode().equals(response.body().getCabecera().getCodigo())) {
-											Log.i(LOG_TAG, "Respuesta exitosa de los detalles del usuario. Response [" + response.body().getObjeto() + "]");
+									if (response.isSuccessful()) {
+											if (StatusResponseEnum.SUCCESS.getCode().equals(response.body().getCabecera().getCodigo())) {
+													Log.i(LOG_TAG, "Respuesta exitosa de los detalles del usuario. Response [" + response.body().getObjeto() + "]");
 
-											SessionConfig.getInstance().setUserDetails(Util
-													.jsonToClass(response.body().getObjeto(), UserDetailsDTO.class));
+													UserDetailsDTO userDetails = Util.jsonToClass(response.body().getObjeto(), UserDetailsDTO.class);
 
-											findOrders();
+													// Set welcome text
+													txtWelcome.setText(String.format(mContext.getString(R.string.txt_appbar_welcome_desc),
+															StringUtils.joinWith(StringUtils.SPACE,
+																	StringUtils.capitalize(userDetails.getPrimerNombre().toLowerCase()),
+																	StringUtils.capitalize(userDetails.getApellidoPaterno().toLowerCase()))));
+
+													txtWelcome.setVisibility(View.VISIBLE);
+
+													SessionConfig.getInstance().setUserDetails(userDetails);
+
+													findOrders();
+											} else {
+													Log.e(LOG_TAG, "onResponse() -> No Success Code -> Ocurrió un error en el GET USER DETAILS");
+													closeDialog(Boolean.FALSE);
+													showErrorDialog("Ocurrió un error en la consulta \n" +
+															"de datos de sesión del usuario \n" +
+															"Mensaje: " + response.body().getCabecera().getDescripcion());
+											}
+
 									} else {
-											Log.e(LOG_TAG, "onResponse() -> Ocurrió un error en el GET USER DETAILS");
+											Log.e(LOG_TAG, "onResponse() -> succesful = false -> Ocurrió un error en el GET USER DETAILS");
 											closeDialog(Boolean.FALSE);
 											showErrorDialog("Ocurrió un error en la consulta \n" +
-													"de datos de sesión del usuario \n");
+													"de datos de sesión del usuario");
 									}
 							}
 
@@ -162,12 +183,15 @@ public class MainActivity extends AppCompatActivity {
 												Log.i(LOG_TAG, "Respuesta exitosa del listado de ordeners. Response [" + response.body().getObjeto() + "]");
 
 												updateOrderData(response.body());
-												refreshContent();
+												refreshContent(Boolean.TRUE);
 										} else {
-												Log.e(LOG_TAG, "onResponse() -> Error controlado en GET ORDERS. Codigo " + response.body().getCabecera().getCodigo());
+												Log.e(LOG_TAG, "onResponse() -> No Success Code -> Error controlado en GET ORDERS. Codigo " + response.body().getCabecera().getCodigo());
+												showErrorDialog("Ocurrió un error al consultar \n" +
+														"las ordenes para su usuario \n" +
+														"Mensaje: " + response.body().getCabecera().getDescripcion());
 										}
 								} else {
-										Log.e(LOG_TAG, "onResponse() -> Ocurrió un error en el GET ORDERS");
+										Log.e(LOG_TAG, "onResponse() -> succesful = false -> Ocurrió un error en el GET ORDERS");
 										closeDialog(Boolean.FALSE);
 										showErrorDialog("Ocurrió un error al consultar \n" +
 												"las ordenes para su usuario");
@@ -195,11 +219,12 @@ public class MainActivity extends AppCompatActivity {
 				appBarLayout.setExpanded(true);
 
 				Toolbar toolbar = findViewById(R.id.toolbar);
-
 				setSupportActionBar(toolbar);
+
 				Objects.requireNonNull(getSupportActionBar()).setDisplayShowTitleEnabled(false);
 
 				menuIcon = toolbar.findViewById(R.id.overflow_icon);
+				txtWelcome = toolbar.findViewById(R.id.txtWelcome);
 				txtCurrentState = findViewById(R.id.txtOrderStates);
 				etxSearchBox = findViewById(R.id.searchEditText);
 
@@ -254,10 +279,10 @@ public class MainActivity extends AppCompatActivity {
 				dialogHandler = new LoadingDialogFragment(MainActivity.this);
 		}
 
-		private void refreshContent() {
+		private void refreshContent(Boolean isDataFromBack) {
 				OrderFragment refreshFragment = (OrderFragment) getSupportFragmentManager().findFragmentByTag(FRAGMENT_TAG);
 				if (Objects.nonNull(refreshFragment)) {
-						refreshFragment.refreshContent(SessionConfig.getInstance().getVisibleList());
+						refreshFragment.refreshContent(SessionConfig.getInstance().getVisibleList(), isDataFromBack);
 						getSupportFragmentManager().beginTransaction()
 								.replace(R.id.container, refreshFragment, FRAGMENT_TAG).commit();
 				}
@@ -269,7 +294,8 @@ public class MainActivity extends AppCompatActivity {
 				SessionConfig session = SessionConfig.getInstance();
 				session.setCommonResponse(response);
 
-				List<OrderDTO> orders = Arrays.asList(Util.jsonToClass(response.getObjeto(), OrderDTO[].class));
+				List<OrderDTO> orders = (Objects.nonNull(response.getObjeto()))
+						? Arrays.asList(Util.jsonToClass(response.getObjeto(), OrderDTO[].class)) : Collections.EMPTY_LIST;
 				session.setAllOrders(orders);
 
 				if (Objects.nonNull(session.getLastSelectedOption())) {
@@ -324,7 +350,7 @@ public class MainActivity extends AppCompatActivity {
 
 						resultList = (wordIsNotEmpty)
 								? allOrders.stream()
-								.filter(it -> it.getCodigoOrden().contains(orderNumber))
+								.filter(it -> it.getCodigoOperacion().contains(orderNumber))
 								.collect(Collectors.toList()) : allOrders;
 
 						txtCurrentState.setText(R.string.state_default_desc);
@@ -332,7 +358,7 @@ public class MainActivity extends AppCompatActivity {
 
 				SessionConfig.getInstance().setVisibleList(resultList);
 
-				if (refresh) refreshContent();
+				if (refresh) refreshContent(Boolean.FALSE);
 		}
 
 		private void showErrorDialog(String content) {
@@ -347,7 +373,6 @@ public class MainActivity extends AppCompatActivity {
 				a.setConfirmClickListener(sDialog -> {
 						sDialog.dismiss();
 						exit();
-						sendToLogin();
 				});
 				a.show();
 		}
@@ -380,7 +405,7 @@ public class MainActivity extends AppCompatActivity {
 		}
 
 		public void exit() {
-				killSessionOnMicrosoft(); // SERGIO SICCHA -> VALIDAR SI AL MORIR APLICACION DEBE CERRAR SESION DE AZURE
+				killSessionOnMicrosoft();
 				SessionConfig.closeSession();
 				sendToLogin();
 		}

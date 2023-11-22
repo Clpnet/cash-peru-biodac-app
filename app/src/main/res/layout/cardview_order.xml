@@ -109,12 +109,12 @@
             android:id="@+id/txtNumberIntent"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="15dp"
-            android:layout_marginTop="115dp"
-            android:text="@string/txt_number_intent_desc"
+            android:layout_marginStart="235dp"
+            android:layout_marginTop="95dp"
+            android:text="@string/txt_card_number_intent_desc"
             android:textColor="@color/Hard_Red"
             android:textStyle="bold"
-            android:visibility="gone"
+            android:visibility="invisible"
             tools:ignore="RelativeOverlap" />
 
         <TextView
@@ -123,7 +123,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="15dp"
             android:layout_marginTop="115dp"
-            android:text="@string/txt_estado_validado_desc"
+            android:text="@string/txt_card_estado_validado_desc"
             android:textColor="#000000"
             android:textStyle="bold"
             android:visibility="gone"

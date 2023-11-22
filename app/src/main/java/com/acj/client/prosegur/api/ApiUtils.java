@@ -18,6 +18,8 @@ import okhttp3.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
+import static com.acj.client.prosegur.util.Util.killSessionOnMicrosoft;
+
 public class ApiUtils {
 
 		// Auth
@@ -71,6 +73,7 @@ public class ApiUtils {
 		}
 
 		private static void redirectToLogin() {
+				killSessionOnMicrosoft();
 				SessionConfig.closeSession();
 
 				Intent loginIntent = new Intent(mContext, LoginActivity.class);

@@ -8,35 +8,35 @@
     android:focusableInTouchMode="true"
     tools:context=".views.login.LoginActivity">
 
+    <ImageView
+        android:id="@+id/imgLogo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="50dp"
+        android:contentDescription="@string/logo_prosegur_desc"
+        android:src="@drawable/prosegur_logo"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
     <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/lytOpciones"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toTopOf="@+id/login_footer"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
         <ImageView
-            android:id="@+id/imgLogo"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="50dp"
-            android:contentDescription="@string/logo_prosegur_desc"
-            android:src="@drawable/prosegur_logo"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <ImageView
             android:id="@+id/imgFingerPrint"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="95dp"
             android:contentDescription="@string/logo_fingerprint_desc"
             android:src="@drawable/fingerprint_logo"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/imgLogo" />
+            app:layout_constraintTop_toTopOf="@+id/lytOpciones" />
 
         <TextView
             android:id="@+id/txtPrincipal"
@@ -46,7 +46,7 @@
             android:layout_marginBottom="10dp"
             android:text="@string/principal_desc"
             android:textColor="@color/black"
-            android:textSize="17sp"
+            android:textSize="20sp"
             app:layout_constraintBottom_toTopOf="@+id/frameLayout"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"

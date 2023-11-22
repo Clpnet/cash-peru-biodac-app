@@ -133,6 +133,19 @@
                         app:layout_constraintTop_toTopOf="@+id/lblCDocumentNumber" />
 
                     <TextView
+                        android:id="@+id/txtCNumberIntent"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="3dp"
+                        android:text="@string/txt_number_intent_desc"
+                        android:textColor="@color/Hard_Red"
+                        android:textStyle="bold"
+                        android:textSize="14sp"
+                        android:visibility="invisible"
+                        app:layout_constraintStart_toStartOf="@+id/lytOrderDetails"
+                        app:layout_constraintTop_toBottomOf="@+id/lblCDocumentNumber" />
+
+                    <TextView
                         android:id="@+id/txtCDate"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"

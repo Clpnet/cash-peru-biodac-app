@@ -12,4 +12,7 @@ public class Constants {
 
 		public static Integer UNAUTHORIZED_CODE = 401;
 
+		// LOG VARIABLES
+		public static String LOG_SEPARATOR = "|";
+
 }
