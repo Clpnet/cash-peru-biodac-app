@@ -1,0 +1,494 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".views.captura.CapturaHuellaActivity">
+
+    <include
+        android:id="@+id/captura_header"
+        layout="@layout/header_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ScrollView
+        android:id="@+id/mainScroll"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:paddingBottom="10dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/captura_footer"
+        app:layout_constraintTop_toBottomOf="@+id/captura_header">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:id="@+id/txtCapturaHuella"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:padding="20dp"
+                android:text="@string/title_captura"
+                android:textColor="@color/black"
+                android:textStyle="bold"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <LinearLayout
+                android:id="@+id/lytCaptura"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="25dp"
+                android:layout_marginEnd="25dp"
+                android:background="@drawable/border_captura_layout"
+                android:orientation="vertical"
+                android:padding="15dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/txtCapturaHuella">
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/lytOrderDetails"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+
+                    <TextView
+                        android:id="@+id/lblCOrderNumber"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/lbl_order_number_desc"
+                        android:textSize="14sp"
+                        android:textColor="@color/black"
+                        android:textStyle="bold"
+                        app:layout_constraintTop_toTopOf="@+id/lytOrderDetails"
+                        app:layout_constraintStart_toStartOf="@+id/lytOrderDetails" />
+
+                    <TextView
+                        android:id="@+id/txtCOrderNumber"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="3dp"
+                        android:text="@string/txt_order_number_desc"
+                        android:textSize="14sp"
+                        android:textColor="@color/black"
+                        android:textStyle="bold"
+                        app:layout_constraintStart_toEndOf="@+id/lblCOrderNumber"
+                        app:layout_constraintTop_toTopOf="@+id/lytOrderDetails" />
+
+                    <TextView
+                        android:id="@+id/txtCOrderType"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="3dp"
+                        android:text="@string/txt_order_type_desc"
+                        android:textColor="@color/black"
+                        android:textSize="14sp"
+                        android:textStyle="bold"
+                        app:layout_constraintStart_toStartOf="@+id/lytOrderDetails"
+                        app:layout_constraintTop_toBottomOf="@+id/lblCOrderNumber" />
+
+                    <TextView
+                        android:id="@+id/txtCCardDesc"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="3dp"
+                        android:text="@string/txt_card_desc"
+                        android:textColor="@color/black"
+                        android:textSize="14sp"
+                        android:textStyle="bold"
+                        app:layout_constraintStart_toStartOf="@+id/lytOrderDetails"
+                        app:layout_constraintTop_toBottomOf="@+id/txtCOrderType" />
+
+                    <TextView
+                        android:id="@+id/lblCDocumentNumber"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="3dp"
+                        android:text="@string/lbl_doc_number_desc"
+                        android:textColor="@color/black"
+                        android:textSize="14sp"
+                        android:textStyle="bold"
+                        app:layout_constraintStart_toStartOf="@+id/lytOrderDetails"
+                        app:layout_constraintTop_toBottomOf="@+id/txtCCardDesc" />
+
+                    <TextView
+                        android:id="@+id/txtCDocumentNumber"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="3dp"
+                        android:text="@string/txt_doc_number_desc"
+                        android:textColor="@color/black"
+                        android:textSize="14sp"
+                        android:textStyle="bold"
+                        app:layout_constraintStart_toEndOf="@+id/lblCDocumentNumber"
+                        app:layout_constraintTop_toTopOf="@+id/lblCDocumentNumber" />
+
+                    <TextView
+                        android:id="@+id/txtCNumberIntent"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="3dp"
+                        android:text="@string/txt_number_intent_desc"
+                        android:textColor="@color/Hard_Red"
+                        android:textStyle="bold"
+                        android:textSize="14sp"
+                        android:visibility="invisible"
+                        app:layout_constraintStart_toStartOf="@+id/lytOrderDetails"
+                        app:layout_constraintTop_toBottomOf="@+id/lblCDocumentNumber" />
+
+                    <TextView
+                        android:id="@+id/txtCDate"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/txt_date_desc"
+                        android:textColor="@color/black"
+                        android:textSize="14sp"
+                        android:textStyle="bold"
+                        app:layout_constraintTop_toBottomOf="@+id/txtCDocumentNumber"
+                        app:layout_constraintBottom_toBottomOf="@+id/lytOrderDetails"
+                        app:layout_constraintStart_toEndOf="@+id/txtCDocumentNumber"
+                        app:layout_constraintEnd_toEndOf="@+id/lytOrderDetails" />
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <LinearLayout
+                    android:id="@+id/lytImagenes"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="25dp"
+                    android:gravity="center">
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="5dp"
+                        android:background="@color/white"
+                        android:orientation="vertical"
+                        android:paddingStart="15dp"
+                        android:paddingTop="8dp"
+                        android:paddingEnd="15dp"
+                        android:paddingBottom="8dp">
+
+                        <TextView
+                            android:id="@+id/lblHuellaIzq"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="10dp"
+                            android:layout_marginBottom="10dp"
+                            android:text="@string/huella_izq_default_desc"
+                            android:textSize="14sp"
+                            android:textColor="@color/black"
+                            android:textStyle="bold" />
+
+                        <ImageView
+                            android:id="@+id/imgManoIzq"
+                            android:layout_width="100dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="10dp"
+                            android:contentDescription="@string/img_huella_izq_desc"
+                            android:src="@drawable/ic_manoizquierda"
+                            android:scaleType="centerCrop"
+                            android:adjustViewBounds="true"
+                            tools:ignore="ImageContrastCheck" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="5dp"
+                        android:background="@color/white"
+                        android:orientation="vertical"
+                        android:paddingStart="15dp"
+                        android:paddingTop="8dp"
+                        android:paddingEnd="15dp"
+                        android:paddingBottom="8dp">
+
+                        <TextView
+                            android:id="@+id/lblHuellaDer"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="10dp"
+                            android:layout_marginBottom="10dp"
+                            android:text="@string/huella_der_default_desc"
+                            android:textSize="14sp"
+                            android:textColor="@color/black"
+                            android:textStyle="bold" />
+
+                        <ImageView
+                            android:id="@+id/imgManoDer"
+                            android:layout_width="100dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="10dp"
+                            android:contentDescription="@string/img_huella_der_desc"
+                            android:src="@drawable/ic_manoderecha"
+                            android:scaleType="centerCrop"
+                            android:adjustViewBounds="true"
+                            tools:ignore="ImageContrastCheck" />
+
+                    </LinearLayout>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/lytBotones"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="13dp"
+                    android:gravity="center"
+                    android:orientation="horizontal">
+
+                    <Button
+                        android:id="@+id/btnCapturaIzq"
+                        android:layout_width="95dp"
+                        android:layout_height="30dp"
+                        android:layout_marginEnd="27dp"
+                        android:background="@drawable/captura_button_yellow"
+                        android:text="@string/btn_captura_desc"
+                        android:textAllCaps="false"
+                        android:textColor="@color/black"
+                        android:textSize="12sp"
+                        android:textStyle="bold"
+                        tools:ignore="ButtonStyle,TouchTargetSizeCheck,TextSizeCheck,DuplicateSpeakableTextCheck" />
+
+                    <Button
+                        android:id="@+id/btnCapturaDer"
+                        android:layout_width="95dp"
+                        android:layout_height="30dp"
+                        android:layout_marginStart="30dp"
+                        android:background="@drawable/captura_button_yellow"
+                        android:text="@string/btn_captura_desc"
+                        android:textAllCaps="false"
+                        android:textColor="@color/black"
+                        android:textSize="12sp"
+                        android:textStyle="bold"
+                        tools:ignore="ButtonStyle,TouchTargetSizeCheck,TextSizeCheck" />
+                </LinearLayout>
+
+                <Button
+                    android:id="@+id/btnEsperandoHuella"
+                    android:layout_width="160dp"
+                    android:layout_height="35dp"
+                    android:layout_marginTop="25dp"
+                    android:layout_gravity="center_horizontal"
+                    android:background="@drawable/login_button_black"
+                    android:drawableStart="@drawable/ic_loading_24"
+                    android:text="@string/btn_espera_huella_desc"
+                    android:textColor="@color/Loading_Orange"
+                    android:textAllCaps="false"
+                    android:textSize="12sp"
+                    android:textStyle="bold"
+                    android:padding="5dp"
+                    android:enabled="false"
+                    android:clickable="false"
+                    android:visibility="gone"
+                    tools:ignore="ButtonStyle,TouchTargetSizeCheck,TextSizeCheck,DuplicateSpeakableTextCheck" />
+
+            </LinearLayout>
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/lytResultados"
+                android:layout_width="220dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:background="@drawable/border_layout"
+                android:padding="15dp"
+                android:visibility="gone"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/lytCaptura"
+
+                tools:ignore="TextSizeCheck">
+
+                <TextView
+                    android:id="@+id/lblRDocumentNumber"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/lbl_result_document_number_desc"
+                    android:textColor="@color/black"
+                    android:textSize="11sp"
+                    android:textStyle="bold"
+                    app:layout_constraintStart_toStartOf="@+id/lytResultados"
+                    app:layout_constraintTop_toTopOf="@+id/lytResultados" />
+
+                <TextView
+                    android:id="@+id/txtRDocumentNumber"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="3dp"
+                    android:text="@string/txt_result_document_number_desc"
+                    android:textColor="@color/black"
+                    android:textSize="11sp"
+                    android:textStyle="bold"
+                    app:layout_constraintStart_toEndOf="@+id/lblRDocumentNumber"
+                    app:layout_constraintTop_toTopOf="@+id/lytResultados" />
+
+                <TextView
+                    android:id="@+id/txtRResultCode"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/lbl_result_code_desc"
+                    android:textColor="@color/black"
+                    android:textSize="11sp"
+                    android:textStyle="bold"
+                    app:layout_constraintStart_toStartOf="@+id/lytResultados"
+                    app:layout_constraintTop_toBottomOf="@+id/lblRDocumentNumber" />
+
+                <TextView
+                    android:id="@+id/txtRResultDesc"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="3dp"
+                    android:text="@string/txt_result_desc"
+                    android:textColor="@color/black"
+                    android:textSize="11sp"
+                    android:textStyle="bold"
+                    app:layout_constraintStart_toEndOf="@+id/txtRResultCode"
+                    app:layout_constraintTop_toBottomOf="@+id/txtRDocumentNumber" />
+
+                <TextView
+                    android:id="@+id/lblNombres"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="7dp"
+                    android:text="@string/lbl_nombres_desc"
+                    android:textColor="@color/black"
+                    android:textSize="11sp"
+                    android:textStyle="bold"
+                    app:layout_constraintStart_toStartOf="@+id/lytResultados"
+                    app:layout_constraintTop_toBottomOf="@+id/txtRResultCode" />
+
+                <TextView
+                    android:id="@+id/txtRNombres"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="3dp"
+                    android:layout_marginTop="7dp"
+                    android:text="@string/txt_nombres_desc"
+                    android:textColor="@color/black"
+                    android:textSize="11sp"
+                    android:textStyle="bold"
+                    app:layout_constraintStart_toEndOf="@+id/lblNombres"
+                    app:layout_constraintTop_toBottomOf="@+id/txtRResultDesc" />
+
+                <TextView
+                    android:id="@+id/lblApPaterno"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/lbl_ap_paterno_desc"
+                    android:textColor="@color/black"
+                    android:textSize="11sp"
+                    android:textStyle="bold"
+                    app:layout_constraintStart_toStartOf="@+id/lytResultados"
+                    app:layout_constraintTop_toBottomOf="@+id/lblNombres" />
+
+                <TextView
+                    android:id="@+id/txtRApPaterno"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="3dp"
+                    android:text="@string/txt_ap_paterno_desc"
+                    android:textColor="@color/black"
+                    android:textSize="11sp"
+                    android:textStyle="bold"
+                    app:layout_constraintStart_toEndOf="@+id/lblApPaterno"
+                    app:layout_constraintTop_toBottomOf="@+id/txtRNombres" />
+
+                <TextView
+                    android:id="@+id/lblApMaterno"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/lbl_ap_materno_desc"
+                    android:textColor="@color/black"
+                    android:textSize="11sp"
+                    android:textStyle="bold"
+                    app:layout_constraintStart_toStartOf="@+id/lytResultados"
+                    app:layout_constraintTop_toBottomOf="@+id/lblApPaterno" />
+
+                <TextView
+                    android:id="@+id/txtRApMaterno"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="3dp"
+                    android:text="@string/txt_ap_materno_desc"
+                    android:textColor="@color/black"
+                    android:textSize="11sp"
+                    android:textStyle="bold"
+                    app:layout_constraintStart_toEndOf="@+id/lblApMaterno"
+                    app:layout_constraintTop_toBottomOf="@+id/txtRApPaterno" />
+
+                <TextView
+                    android:id="@+id/lblIdTransaccion"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/lbl_id_transaccion_desc"
+                    android:textColor="@color/black"
+                    android:textSize="11sp"
+                    android:textStyle="bold"
+                    app:layout_constraintStart_toStartOf="@+id/lytResultados"
+                    app:layout_constraintTop_toBottomOf="@+id/lblApMaterno" />
+
+                <TextView
+                    android:id="@+id/txtRIdTransaccion"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="3dp"
+                    android:text="@string/txt_id_transaccion_desc"
+                    android:textColor="@color/black"
+                    android:textSize="11sp"
+                    android:textStyle="bold"
+                    app:layout_constraintStart_toEndOf="@+id/lblIdTransaccion"
+                    app:layout_constraintTop_toBottomOf="@+id/txtRApMaterno" />
+
+                <TextView
+                    android:id="@+id/txtRErrorDesc"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="@string/txt_intents_error"
+                    android:textColor="@color/bg_danger"
+                    android:textSize="11sp"
+                    android:textStyle="bold"
+                    android:visibility="gone"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/txtRIdTransaccion" />
+
+                <Button
+                    android:id="@+id/btnOtraConsulta"
+                    android:layout_width="165dp"
+                    android:layout_height="30dp"
+                    android:layout_marginTop="13dp"
+                    android:background="@drawable/captura_button_yellow"
+                    android:text="@string/btn_otra_consulta_desc"
+                    android:textAllCaps="false"
+                    android:textColor="@color/black"
+                    android:textSize="12sp"
+                    android:textStyle="bold"
+                    app:layout_constraintEnd_toEndOf="@+id/lytResultados"
+                    app:layout_constraintStart_toStartOf="@+id/lytResultados"
+                    app:layout_constraintTop_toBottomOf="@+id/txtRErrorDesc"
+                    tools:ignore="ButtonStyle,TouchTargetSizeCheck,TextSizeCheck,DuplicateSpeakableTextCheck" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </ScrollView>
+
+    <include
+        android:id="@+id/captura_footer"
+        layout="@layout/footer_layout"
+        android:layout_width="match_parent"
+        android:layout_height="30dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

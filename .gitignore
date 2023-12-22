@@ -1,0 +1,39 @@
+# Archivos generados por Android Studio
+.gradle/
+.idea/
+
+# Directorios de compilación generados por Gradle
+app/build/
+build/
+
+# Archivos generados por el sistema de construcción de Gradle
+build.gradle
+local.properties
+
+# Archivos de configuración de Gradle
+/.gradle/
+/captures/
+
+# Archivos de salida de pruebas
+*.iml
+*.log
+
+# Directorio de construcción de Android
+build/
+captures/
+bin/
+
+# Directorio de salida de pruebas
+test-results/
+
+# Directorios generados por ProGuard
+proguard/
+
+# Archivos generados por el sistema operativo
+.DS_Store
+Thumbs.db
+
+# Configuración de archivos Android
+AndroidManifest.xml
+*/local.properties
+*/gradle-wrapper.properties

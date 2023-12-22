@@ -1,0 +1,84 @@
+<resources>
+    <string name="app_name">BIODAC</string>
+    <string name="app_version">v 1.0</string>
+    <string name="powered_by">© 2023 Powered by ACJ Soluciones</string>
+    <string name="action_settings">Settings</string>
+
+    <!-- LOADING -->
+    <string name="gf_loading_desc">Gif Cargando</string>
+
+    <!-- LOGIN -->
+    <string name="logo_prosegur_desc">Logo Prosegur</string>
+    <string name="logo_fingerprint_desc">Imagen huella digital</string>
+    <string name="ic_username_desc">Icono caja de texto Usuario</string>
+    <string name="ic_password_desc">Icono caja de texto Password</string>
+    <string name="hint_username_desc">Usuario</string>
+    <string name="hint_password_desc">Contraseña</string>
+    <string name="btn_ingresar_desc">INGRESAR</string>
+    <string name="btn_microsoft_desc">\t\tLog In with Microsoft</string>
+    <string name="principal_desc">Autenticación de Usuario</string>
+
+    <!-- MAIN -->
+    <string name="ic_dropdown_desc">Icono caja de texto Usuario</string>
+    <string name="txt_appbar_welcome_desc">Bienvenido %s</string>
+    <string name="state_default_desc">ORDENES</string>
+    <string name="state_pending_desc">PENDIENTES</string>
+    <string name="state_hit_desc">HIT</string>
+    <string name="state_nohit_desc">NO HIT</string>
+    <string name="search_desc">ORDENES PROCESADAS</string>
+    <string name="txt_empty_order_list_desc">USTED NO TIENE ORDENES CARGADAS</string>
+    <string name="txt_orders_not_found">NO SE ENCONTRARON ORDENES</string>
+
+    <!-- CARD -->
+    <string name="lbl_card_order_number">Nro de Orden:</string>
+    <string name="txt_card_order_number_desc">11111111111111</string>
+    <string name="txt_card_order_type_desc">TC</string>
+    <string name="txt_card_card_desc">INTERBANK</string>
+    <string name="lbl_card_document_number">N° de Documento:</string>
+    <string name="txt_card_document_number_desc">70985144</string>
+    <string name="lbl_card_fec_entrega">Fec. Entrega:</string>
+    <string name="txt_card_fec_entrega_desc">01/02/2023</string>
+    <string name="txt_card_number_intent_desc">N° de Intentos (%s)</string>
+    <string name="txt_card_estado_validado_desc">Validado</string>
+    <string name="lbl_card_fec_ult_intento">Último Intento:</string>
+    <string name="txt_card_fec_ult_intento_desc">01/02/2023 06:05:01</string>
+    <string name="btn_card_default_state">Creado</string>
+
+
+    <!-- CAPTURA -->
+    <string name="title_captura">CAPTURA DE HUELLA</string>
+    <string name="lbl_order_number_desc">Nro de Orden:</string>
+    <string name="txt_order_number_desc">123456789012345</string>
+    <string name="txt_order_type_desc">TC</string>
+    <string name="txt_card_desc">INTERBANK</string>
+    <string name="lbl_doc_number_desc">N° de Documento:</string>
+    <string name="txt_doc_number_desc">1234****</string>
+    <string name="txt_number_intent_desc">N° de Intentos (%s)</string>
+    <string name="txt_date_desc">01/02/2023 06:05:01</string>
+    <string name="lbl_result_document_number_desc">DNI:</string>
+    <string name="txt_result_document_number_desc">08765432</string>
+    <string name="lbl_result_code_desc">70006:</string>
+    <string name="txt_result_desc">HIT - Validación Correcta</string>
+    <string name="lbl_nombres_desc">Nombres:</string>
+    <string name="txt_nombres_desc">JOSÉ MANUEL</string>
+    <string name="lbl_ap_paterno_desc">Apellido Paterno:</string>
+    <string name="txt_ap_paterno_desc">PEREZ</string>
+    <string name="lbl_ap_materno_desc">Apellido Materno:</string>
+    <string name="txt_ap_materno_desc">CASTRO</string>
+    <string name="lbl_id_transaccion_desc">Id Transacción:</string>
+    <string name="txt_id_transaccion_desc">12345</string>
+    <string name="txt_intents_error">Ha superado el límite de validaciones.</string>
+    <string name="huella_izq_default_desc">Pulgar Izquierdo</string>
+    <string name="huella_der_default_desc">Pulgar Derecho</string>
+    <string name="img_huella_izq_desc">Imagen de la huella izquierda</string>
+    <string name="img_huella_der_desc">Imagen de la huella derecha</string>
+    <string name="btn_captura_desc">CAPTURA</string>
+    <string name="btn_espera_huella_desc">ESPERANDO HUELLA</string>
+    <string name="btn_otra_consulta_desc">OTRA CONSULTA</string>
+
+
+    <string name="pending_option_desc">Órdenes Pendientes (%s)</string>
+    <string name="hit_option_desc">Órdenes Hit (%s)</string>
+    <string name="nohit_option_desc">Órdenes No Hit (%s)</string>
+
+</resources>

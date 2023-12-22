@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:state_hovered="false">
+        <shape>
+            <solid android:color="@color/yellow_prosegur" /> <!-- Color de fondo cuando no se hace hover -->
+        </shape>
+    </item>
+    <item android:state_hovered="true">
+        <shape>
+            <solid android:color="@color/black" /> <!-- Color de fondo cuando se hace hover -->
+        </shape>
+    </item>
+</selector>

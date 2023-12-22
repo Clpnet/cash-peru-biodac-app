@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:padding="10dp">
+
+    <TextView
+        android:id="@+id/tv_nro_dni"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="DNI: 87654321" />
+
+    <TextView
+        android:id="@+id/tv_respuesta"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="25dp"
+        android:text="70006 : HIT - Validación Correcta" />
+
+    <TextView
+        android:id="@+id/tv_nombres"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="65dp"
+        android:text="Nombres" />
+
+    <TextView
+        android:id="@+id/tv_ape_pat"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="85dp"
+        android:text="Apellido Pat" />
+
+    <TextView
+        android:id="@+id/tv_ape_mat"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="105dp"
+        android:text="Apellido Mat" />
+
+    <TextView
+        android:id="@+id/tv_id_transac"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="125dp"
+        android:layout_marginBottom="8dp"
+        android:text="Id Transacción: 123456" />
+
+    <Button
+        android:id="@+id/btn_nueva_consul"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@id/tv_id_transac"
+        android:text="Otra Consulta"
+        android:textAllCaps="false" />
+
+</RelativeLayout>
