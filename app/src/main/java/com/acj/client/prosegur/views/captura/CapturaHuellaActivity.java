@@ -47,6 +47,8 @@ import com.google.android.material.appbar.AppBarLayout;
 import java.util.Objects;
 
 import cn.pedant.SweetAlert.SweetAlertDialog;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 import lombok.SneakyThrows;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -112,19 +114,24 @@ public class CapturaHuellaActivity extends AppCompatActivity {
     private ResponseObjectReniec mejoresHuellasResponse;
     private ResponseObjectReniec validacionResponse;
     private Integer numberIntent;
+    private Boolean successFakeCapture = Boolean.FALSE;
 
     private Context mContext;
 
     private LoadingDialogFragment dialogHandler;
 
-    private String buttonPressed;
+    private ButtonEnum buttonPressed;
 
     // Services
     private DatoBiometricoService datoBiometricoService;
 
+    @Getter
+    @AllArgsConstructor
     enum ButtonEnum {
-        IZQ,
-        DER
+        IZQ("IZQUIERDA"),
+        DER("DERECHA");
+
+        private final String description;
     }
 
     @Override
@@ -214,14 +221,14 @@ public class CapturaHuellaActivity extends AppCompatActivity {
 
         btnCapturaIzq.setOnClickListener(view -> {
             Log.i(LOG_TAG, "Click on left capture button");
-            buttonPressed = ButtonEnum.IZQ.toString();
+            buttonPressed = ButtonEnum.IZQ;
             updateCaptureButtonState(Boolean.FALSE);
             new CaptureThread().start();
         });
 
         btnCapturaDer.setOnClickListener(view -> {
             Log.i(LOG_TAG, "Click on right capture button");
-            buttonPressed = ButtonEnum.DER.toString();
+            buttonPressed = ButtonEnum.DER;
             updateCaptureButtonState(Boolean.FALSE);
             new CaptureThread().start();
         });
@@ -358,10 +365,10 @@ public class CapturaHuellaActivity extends AppCompatActivity {
                         a.show();
                     });
                 } else {
-                    runOnUiThread(() -> btnAwaiting.setVisibility(View.VISIBLE));
+                    fingerprintCaptureValidation();
                     Log.i(LOG_TAG, "CaptureThread.run() -> Iniciando captura de huella");
                     eikonManager.captureImage();
-                    runOnUiThread(CapturaHuellaActivity.this::UpdateGUI);
+                    validateCapturedFingerprint();
                 }
             } catch (Exception e) {
                 throw new RuntimeException("Error ocurred on fingerprint capture. Exception: " + e);
@@ -370,27 +377,49 @@ public class CapturaHuellaActivity extends AppCompatActivity {
 
     }
 
+    public void fingerprintCaptureValidation() {
+        runOnUiThread(() -> {
+            if (Boolean.TRUE) {
+                Log.i(LOG_TAG, "fingerprintCaptureValidation() -> Fake Capture " + successFakeCapture);
+                btnAwaiting.setText(StringUtils.joinWith(StringUtils.SPACE, mContext.getString(R.string.btn_espera_huella_desc),
+                    (!successFakeCapture)
+                        ? (ButtonEnum.IZQ.equals(buttonPressed)) ? ButtonEnum.DER.getDescription() : ButtonEnum.IZQ.getDescription()
+                        : buttonPressed.getDescription()));
+            } else {
+                btnAwaiting.setText(StringUtils.joinWith(StringUtils.SPACE, mContext.getString(R.string.btn_espera_huella_desc), buttonPressed.getDescription()));
+            }
+
+            btnAwaiting.setVisibility(View.VISIBLE);
+        });
+    }
+
     private void closeDialog(Boolean delay) {
         if (Objects.nonNull(dialogHandler.getDialog()) && dialogHandler.getDialog().isShowing())
             new Handler(Looper.getMainLooper()).postDelayed(() -> dialogHandler.dismiss(), (delay) ? 900 : 0);
     }
 
-    public void UpdateGUI() {
+    public void validateCapturedFingerprint() {
         Integer captureScore = eikonManager.getCaptureScore();
 
-        if (captureScore == 0 || captureScore > 2) {
-            showInfoDialog("EIKON SDK - Device",
-                "La imágen capturada presenta baja calidad\nPor favor reintente la captura.",
-                (dialog, which) -> {
-                    dialog.dismiss();
-                    updateCaptureButtonState(Boolean.TRUE);
-                });
-            return;
+        if (successFakeCapture) {
+
+            runOnUiThread(() -> btnAwaiting.setVisibility(View.GONE));
+
+            if (captureScore == 0 || captureScore > 2) {
+                showInfoDialog("EIKON SDK - Device",
+                    "La imágen capturada presenta baja calidad\nPor favor reintente la captura.",
+                    (dialog, which) -> {
+                        dialog.dismiss();
+                        updateCaptureButtonState(Boolean.TRUE);
+                    });
+                return;
+            }
+
+            validateWithBackend();
+        } else {
+            successFakeCapture = Boolean.TRUE;
+            new CaptureThread().start();
         }
-
-        btnAwaiting.setVisibility(View.GONE);
-
-        validateFingerprint();
 
     }
 
@@ -425,7 +454,7 @@ public class CapturaHuellaActivity extends AppCompatActivity {
             .create().show();
     }
 
-    public void validateFingerprint() {
+    public void validateWithBackend() {
         dialogHandler.show(getSupportFragmentManager(), LOADING_DIALOG_TAG);
 
         String fingerPrintBytes = Util.bytesToString(eikonManager.getFingerPrintBytes());
@@ -442,7 +471,7 @@ public class CapturaHuellaActivity extends AppCompatActivity {
         RequestValidateDTO requestValidateDTO = new RequestValidateDTO();
         requestValidateDTO.setIdOrdenDetalle(currentOrder.getIdOrdenDetalle());
         requestValidateDTO.setNumeroSerie(deviceSerialNumber);
-        requestValidateDTO.setIdentificadorDedo((ButtonEnum.IZQ.toString().equals(buttonPressed))
+        requestValidateDTO.setIdentificadorDedo((ButtonEnum.IZQ.equals(buttonPressed))
             ? Integer.valueOf(mejoresHuellasResponse.getMejorHuellaIzquierda())
             : Integer.valueOf(mejoresHuellasResponse.getMejorHuellaDerecha()));
         requestValidateDTO.setTemplate(fingerPrintBytes);
@@ -479,7 +508,10 @@ public class CapturaHuellaActivity extends AppCompatActivity {
                                     .setTitle("AVISO")
                                     .setMessage("Validación Incorrecta\n¿Desea reintentar?")
                                     .setCancelable(false)
-                                    .setPositiveButton("SI", (dialog, which) -> updateCaptureButtonState(Boolean.TRUE))
+                                    .setPositiveButton("SI", (dialog, which) -> {
+                                        successFakeCapture = Boolean.FALSE;
+                                        updateCaptureButtonState(Boolean.TRUE);
+                                    })
                                     .setNegativeButton("NO", (dialog, which) -> finish())
                                     .create().show();
 

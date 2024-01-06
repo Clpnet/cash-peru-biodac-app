@@ -274,8 +274,8 @@
 
                 <Button
                     android:id="@+id/btnEsperandoHuella"
-                    android:layout_width="160dp"
-                    android:layout_height="35dp"
+                    android:layout_width="170dp"
+                    android:layout_height="40dp"
                     android:layout_marginTop="25dp"
                     android:layout_gravity="center_horizontal"
                     android:background="@drawable/login_button_black"
