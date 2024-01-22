@@ -1,9 +1,11 @@
 package com.acj.client.prosegur.config;
 
 import android.annotation.SuppressLint;
+import android.app.AlertDialog;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Bitmap;
@@ -11,6 +13,7 @@ import android.graphics.Color;
 import android.hardware.usb.UsbDevice;
 import android.hardware.usb.UsbManager;
 import android.util.Log;
+import com.acj.client.prosegur.R;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -34,7 +37,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Objects;
 
-import cn.pedant.SweetAlert.SweetAlertDialog;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -96,22 +98,17 @@ public class EikonManager {
             managerFragment.requestPermission(deviceFragment, mPermissionIntentFragment);
         } else {
             Log.i(LOG_TAG, "Reader Not Found");
-            SweetAlertDialog a = new SweetAlertDialog(context, SweetAlertDialog.ERROR_TYPE);
-            a.setCancelable(false);
-            a.setCanceledOnTouchOutside(false);
-            a.setTitleText("EIKON Fingerprint SDK");
-            a.setConfirmText("OK");
-            a.setConfirmButtonTextColor(Color.WHITE);
-            a.setConfirmButtonBackgroundColor(Color.RED);
-            a.setContentText("¡La inicialización del scanner" +
-                    " de huellas digitales ha fallado!" + "\n" +
-                    "Conecte el scanner a su dispositivo");
-            a.setConfirmClickListener(sDialog -> {
-                sDialog.dismiss();
-                callerActivity.finish();
-                SessionConfig.getInstance().setAllowedPermission(false);
-            });
-            a.show();
+
+            AlertDialog alertDialog = new AlertDialog.Builder(context).create();
+            alertDialog.setTitle(context.getString(R.string.title_device_manager));
+            alertDialog.setMessage(context.getString(R.string.err_device_initialice));
+            alertDialog.setButton(DialogInterface.BUTTON_POSITIVE, context.getString(R.string.btn_confirmation),
+                (dialog, which) -> {
+                    dialog.dismiss();
+                    callerActivity.finish();
+                    SessionConfig.getInstance().setAllowedPermission(false);
+                });
+            alertDialog.show();
 
             context.unregisterReceiver(receiver);
         }

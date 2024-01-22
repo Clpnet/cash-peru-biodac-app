@@ -11,7 +11,6 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.Color;
 import android.hardware.usb.UsbDevice;
 import android.hardware.usb.UsbManager;
 import android.os.Bundle;
@@ -26,7 +25,9 @@ import android.widget.TextView;
 
 import com.acj.client.prosegur.api.ApiService.DatoBiometricoService;
 import com.acj.client.prosegur.api.ApiUtils;
+import com.acj.client.prosegur.config.MorphoManager;
 import com.acj.client.prosegur.model.common.CommonResponse;
+import com.acj.client.prosegur.model.constant.BrandEnum;
 import com.acj.client.prosegur.model.constant.ErrorReniecEnum;
 import com.acj.client.prosegur.model.constant.FingerEnum;
 import com.acj.client.prosegur.model.constant.OrderStateEnum;
@@ -37,16 +38,31 @@ import com.acj.client.prosegur.config.EikonManager;
 import com.acj.client.prosegur.model.constant.EnumExtra;
 import com.acj.client.prosegur.R;
 import com.acj.client.prosegur.config.SessionConfig;
+import com.acj.client.prosegur.model.dto.user.SerialNumberDTO;
 import com.acj.client.prosegur.util.Util;
 import com.acj.client.prosegur.model.dto.biometric.RequestValidateDTO;
 import com.acj.client.prosegur.views.dialog.LoadingDialogFragment;
 import com.acj.client.prosegur.views.login.LoginActivity;
 import com.digitalpersona.uareu.ReaderCollection;
 import com.google.android.material.appbar.AppBarLayout;
+import com.morpho.morphosmart.sdk.CallbackMask;
+import com.morpho.morphosmart.sdk.Coder;
+import com.morpho.morphosmart.sdk.CompressionAlgorithm;
+import com.morpho.morphosmart.sdk.DetectionMode;
+import com.morpho.morphosmart.sdk.EnrollmentType;
+import com.morpho.morphosmart.sdk.ErrorCodes;
+import com.morpho.morphosmart.sdk.LatentDetection;
+import com.morpho.morphosmart.sdk.MorphoDevice;
+import com.morpho.morphosmart.sdk.StrategyAcquisitionMode;
+import com.morpho.morphosmart.sdk.Template;
+import com.morpho.morphosmart.sdk.TemplateFVPType;
+import com.morpho.morphosmart.sdk.TemplateList;
+import com.morpho.morphosmart.sdk.TemplateType;
 
 import java.util.Objects;
+import java.util.Observable;
+import java.util.Observer;
 
-import cn.pedant.SweetAlert.SweetAlertDialog;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.SneakyThrows;
@@ -59,7 +75,7 @@ import static com.acj.client.prosegur.util.Util.killSessionOnMicrosoft;
 
 import org.apache.commons.lang3.StringUtils;
 
-public class CapturaHuellaActivity extends AppCompatActivity {
+public class CapturaHuellaActivity extends AppCompatActivity implements Observer {
 
     private final String LOG_TAG = CapturaHuellaActivity.class.getSimpleName();
 
@@ -103,18 +119,28 @@ public class CapturaHuellaActivity extends AppCompatActivity {
     // Dialog
     private AlertDialog.Builder dialogBuilder;
 
-    // Eikon Globals
-
+    // Reader Globals
     private EikonManager eikonManager;
+    private MorphoManager morphoManager;
 
+    // Eikon
     private ReaderCollection readers;
 
+    // Morpho
+    private MorphoDevice morphoDevice;
+    private Template morphoCapturedTemplate;
+
     // Variables Globales
+    private SessionConfig sessionConfig;
     private OrderDTO currentOrder;
+    private SerialNumberDTO device;
     private ResponseObjectReniec mejoresHuellasResponse;
     private ResponseObjectReniec validacionResponse;
     private Integer numberIntent;
+
+    // Variables de Control
     private Boolean successFakeCapture = Boolean.FALSE;
+    private Boolean successFirstFinger = Boolean.FALSE;
 
     private Context mContext;
 
@@ -124,6 +150,9 @@ public class CapturaHuellaActivity extends AppCompatActivity {
 
     // Services
     private DatoBiometricoService datoBiometricoService;
+
+    @Override
+    public void update(Observable observable, Object o) {}
 
     @Getter
     @AllArgsConstructor
@@ -140,6 +169,7 @@ public class CapturaHuellaActivity extends AppCompatActivity {
         setContentView(R.layout.activity_captura_huella);
 
         mContext = this;
+        sessionConfig = SessionConfig.getInstance();
 
         // Inicializando elementos de la vista
         initViewElements();
@@ -149,13 +179,28 @@ public class CapturaHuellaActivity extends AppCompatActivity {
         currentOrder = (OrderDTO) intent.getSerializableExtra(EnumExtra.CURRENT_ORDER.toString());
         numberIntent = currentOrder.getOrdenesIntento().size();
 
+        device = !sessionConfig.getUserDetails().getLector().isEmpty()
+            ? sessionConfig.getUserDetails().getLector().get(0) : null;
+
+        currentOrder.setDobleConsulta(Boolean.FALSE); // SERGIO SICCHA -> QUITAR
+
         setOrderContent();
 
         // Init service objects
         datoBiometricoService = ApiUtils.getApi(mContext).create(DatoBiometricoService.class);
 
         eikonManager = new EikonManager(mContext);
-        eikonManager.requestPermission(captureUsbReceiver, CapturaHuellaActivity.this);
+        morphoManager = new MorphoManager(mContext);
+
+        if (BrandEnum.M.equals(device.getMarca())) {
+            morphoManager.requestPermission();
+            morphoDevice = morphoManager.getMorphoDevice();
+
+            dialogHandler.show(getSupportFragmentManager(), LOADING_DIALOG_TAG);
+            getMejoresHuellas();
+        } else if (BrandEnum.H.equals(device.getMarca())) {
+            eikonManager.requestPermission(captureUsbReceiver, CapturaHuellaActivity.this);
+        }
 
         updateCaptureButtonState(Boolean.FALSE);
     }
@@ -210,11 +255,11 @@ public class CapturaHuellaActivity extends AppCompatActivity {
             }
 
             pendingOption.setTitle(String.format(getString(R.string.pending_option_desc),
-                SessionConfig.getInstance().getTotalPending().toString()));
+                sessionConfig.getTotalPending().toString()));
             hitOption.setTitle(String.format(getString(R.string.hit_option_desc),
-                SessionConfig.getInstance().getTotalHit().toString()));
+                sessionConfig.getTotalHit().toString()));
             noHitOption.setTitle(String.format(getString(R.string.nohit_option_desc),
-                SessionConfig.getInstance().getTotalNoHit().toString()));
+                sessionConfig.getTotalNoHit().toString()));
 
             orderMenu.show();
         });
@@ -223,19 +268,34 @@ public class CapturaHuellaActivity extends AppCompatActivity {
             Log.i(LOG_TAG, "Click on left capture button");
             buttonPressed = ButtonEnum.IZQ;
             updateCaptureButtonState(Boolean.FALSE);
-            new CaptureThread().start();
+            beginDeviceCapture();
         });
 
         btnCapturaDer.setOnClickListener(view -> {
             Log.i(LOG_TAG, "Click on right capture button");
             buttonPressed = ButtonEnum.DER;
             updateCaptureButtonState(Boolean.FALSE);
-            new CaptureThread().start();
+            beginDeviceCapture();
         });
 
         btnOtraConsulta.setOnClickListener(view -> finish());
 
         dialogHandler = new LoadingDialogFragment(CapturaHuellaActivity.this);
+    }
+
+    private void beginDeviceCapture() {
+        if (BrandEnum.M.equals(device.getMarca())) {
+            int activationResult = morphoManager.activateReader(CapturaHuellaActivity.this);
+            if (activationResult == 0)  {
+                new MorphoCaptureThread().start();
+            } else {
+                /*runOnUiThread(() -> showErrorDialog(mContext.getString(R.string.title_device_manager),
+                    mContext.getString(R.string.err_device_not_detected),
+                    (dialog, which) -> finish()));*/
+            }
+        } else if (BrandEnum.H.equals(device.getMarca())) {
+            new EikonCaptureThread().start();
+        }
     }
 
     private void setOrderContent() {
@@ -276,13 +336,12 @@ public class CapturaHuellaActivity extends AppCompatActivity {
                         updateCaptureButtonState(Boolean.TRUE);
 
                         closeDialog(Boolean.TRUE);
-
                     } else {
-                        Log.e(LOG_TAG, "getMejoresHuellas.onResponse() -> No Success Code -> Ocurrió un error en el GET USER DETAILS");
+                        Log.e(LOG_TAG, "getMejoresHuellas.onResponse() -> No Success Code -> Ocurrió un error en la consulta de mejores huellas");
                         closeDialog(Boolean.FALSE);
-                        /*showErrorDialog("Ocurrió un error en la consulta \n" +
-                            "de datos de sesión del usuario \n" +
-                            "Mensaje: " + response.body().getCabecera().getDescripcion());*/
+                        showErrorDialog(mContext.getString(R.string.app_name),
+                            String.format(mContext.getString(R.string.err_mh_search), response.body().getCabecera().getDescripcion()),
+                            (dialog, which) -> finish());
                     }
                 } else {
                     Log.e(LOG_TAG, "getMejoresHuellas.onResponse() -> Ocurrió un error en el GET MEJORES HUELLAS");
@@ -316,15 +375,15 @@ public class CapturaHuellaActivity extends AppCompatActivity {
         switch (id) {
             case R.id.opt_pending:
                 Log.i(LOG_TAG, "onOptionsItemSelected() -> Filtrando solo ordenes con estado " + OrderStateEnum.C);
-                SessionConfig.getInstance().setLastSelectedOption(OrderStateEnum.C);
+                sessionConfig.setLastSelectedOption(OrderStateEnum.C);
                 break;
             case R.id.opt_hit:
                 Log.i(LOG_TAG, "onOptionsItemSelected() -> Filtrando solo ordenes con estado " + OrderStateEnum.H);
-                SessionConfig.getInstance().setLastSelectedOption(OrderStateEnum.H);
+                sessionConfig.setLastSelectedOption(OrderStateEnum.H);
                 break;
             case R.id.opt_no_hit:
                 Log.i(LOG_TAG, "onOptionsItemSelected() -> Filtrando solo ordenes con estado " + OrderStateEnum.N);
-                SessionConfig.getInstance().setLastSelectedOption(OrderStateEnum.N);
+                sessionConfig.setLastSelectedOption(OrderStateEnum.N);
                 break;
             case R.id.opt_exit:
                 exit();
@@ -336,7 +395,7 @@ public class CapturaHuellaActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    class CaptureThread extends Thread {
+    class EikonCaptureThread extends Thread {
         @SneakyThrows
         @Override
         public void run() {
@@ -348,22 +407,9 @@ public class CapturaHuellaActivity extends AppCompatActivity {
                 if (readers.size() < 1) {
                     Log.i(LOG_TAG, "CaptureThread.run() -> No hay huellero");
 
-                    runOnUiThread(() -> {
-                        SweetAlertDialog a = new SweetAlertDialog(mContext, SweetAlertDialog.ERROR_TYPE);
-                        a.setCancelable(false);
-                        a.setCanceledOnTouchOutside(false);
-                        a.setTitleText("EIKON Fingerprint SDK");
-                        a.setConfirmText("OK");
-                        a.setConfirmButtonTextColor(Color.WHITE);
-                        a.setConfirmButtonBackgroundColor(Color.RED);
-                        a.setContentText("¡No se encontró ningún lector!" + "\n" +
-                            "Conecte el scanner a su dispositivo");
-                        a.setConfirmClickListener(sDialog -> {
-                            sDialog.dismiss();
-                            finish();
-                        });
-                        a.show();
-                    });
+                    runOnUiThread(() -> showErrorDialog(mContext.getString(R.string.title_device_manager),
+                        mContext.getString(R.string.err_device_not_detected),
+                        (dialog, which) -> finish()));
                 } else {
                     fingerprintCaptureValidation();
                     Log.i(LOG_TAG, "CaptureThread.run() -> Iniciando captura de huella");
@@ -377,11 +423,76 @@ public class CapturaHuellaActivity extends AppCompatActivity {
 
     }
 
+    class MorphoCaptureThread extends Thread {
+        @Override
+        public void run() {
+            if (Looper.myLooper() == null)
+                Looper.prepare();
+
+            final TemplateList templateList = new TemplateList();
+
+            int timeout = 10000;
+            int acquisitionThreshold = 0;
+            int advancedSecurityLevelsRequired = 0;
+            int nbFinger = 1;
+            TemplateType templateType = TemplateType.MORPHO_PK_ANSI_378;
+            TemplateFVPType templateFVPType = TemplateFVPType.MORPHO_NO_PK_FVP;
+            int maxSizeTemplate = 255;
+            EnrollmentType enrollType = EnrollmentType.ONE_ACQUISITIONS;
+            LatentDetection latentDetection = LatentDetection.LATENT_DETECT_DISABLE;
+            Coder coderChoice = Coder.MORPHO_DEFAULT_CODER;
+            int detectModeChoice = DetectionMode.MORPHO_FORCE_FINGER_ON_TOP_DETECT_MODE.getValue();
+            int callbackCmd = CallbackMask.MORPHO_CALLBACK_IMAGE_CMD.getValue()
+                | CallbackMask.MORPHO_CALLBACK_ENROLLMENT_CMD.getValue()
+                | CallbackMask.MORPHO_CALLBACK_COMMAND_CMD.getValue()
+                | CallbackMask.MORPHO_CALLBACK_CODEQUALITY.getValue()
+                | CallbackMask.MORPHO_CALLBACK_DETECTQUALITY.getValue()
+                | CallbackMask.MORPHO_CALLBACK_BUSY_WARNING.getValue();
+
+            Log.i(LOG_TAG, "callbackCmd: " + callbackCmd);
+
+            int ret = morphoDevice.setStrategyAcquisitionMode(StrategyAcquisitionMode.MORPHO_ACQ_EXPERT_MODE);
+
+            fingerprintCaptureValidation();
+            Log.i(LOG_TAG, "MorphoCaptureThread.run() -> Iniciando captura de huella");
+
+            if (ret == ErrorCodes.MORPHO_OK) {
+                ret = morphoDevice.capture(timeout, acquisitionThreshold, advancedSecurityLevelsRequired,
+                    nbFinger, templateType, templateFVPType, maxSizeTemplate, enrollType,
+                    latentDetection, coderChoice, detectModeChoice, CompressionAlgorithm.MORPHO_NO_COMPRESS, 0, templateList, callbackCmd, CapturaHuellaActivity.this);
+            }
+
+            try {
+                if (ret == ErrorCodes.MORPHO_OK) {
+                    final int NbTemplate = templateList.getNbTemplate();
+                    if (NbTemplate > 0) {
+                        morphoCapturedTemplate = templateList.getTemplate(0);
+                    } else {
+                        runOnUiThread(() -> showErrorDialog(mContext.getString(R.string.app_name),
+                            mContext.getString(R.string.err_capture),
+                            (dialog, which) -> updateCaptureButtonState(Boolean.TRUE)));
+                    }
+                    morphoDevice.cancelLiveAcquisition();
+                    validateCapturedFingerprint();
+                } else {
+                    runOnUiThread(() -> showErrorDialog(mContext.getString(R.string.app_name),
+                        mContext.getString(R.string.err_capture),
+                        (dialog, which) -> updateCaptureButtonState(Boolean.TRUE)));
+                }
+
+                Looper.loop();
+
+            } catch (Exception e) {
+                Log.i(LOG_TAG, e.toString());
+            }
+        }
+    }
+
     public void fingerprintCaptureValidation() {
         runOnUiThread(() -> {
             if (Boolean.TRUE) {
                 Log.i(LOG_TAG, "fingerprintCaptureValidation() -> Fake Capture " + successFakeCapture);
-                btnAwaiting.setText(StringUtils.joinWith(StringUtils.SPACE, mContext.getString(R.string.btn_espera_huella_desc),
+                btnAwaiting.setText( StringUtils.joinWith(StringUtils.SPACE, mContext.getString(R.string.btn_espera_huella_desc),
                     (!successFakeCapture)
                         ? (ButtonEnum.IZQ.equals(buttonPressed)) ? ButtonEnum.DER.getDescription() : ButtonEnum.IZQ.getDescription()
                         : buttonPressed.getDescription()));
@@ -399,28 +510,25 @@ public class CapturaHuellaActivity extends AppCompatActivity {
     }
 
     public void validateCapturedFingerprint() {
-        Integer captureScore = eikonManager.getCaptureScore();
-
-        if (successFakeCapture) {
-
-            runOnUiThread(() -> btnAwaiting.setVisibility(View.GONE));
-
-            if (captureScore == 0 || captureScore > 2) {
-                showInfoDialog("EIKON SDK - Device",
-                    "La imágen capturada presenta baja calidad\nPor favor reintente la captura.",
-                    (dialog, which) -> {
-                        dialog.dismiss();
-                        updateCaptureButtonState(Boolean.TRUE);
-                    });
-                return;
-            }
-
+        if (currentOrder.getDobleConsulta()) {
+            if (successFirstFinger) runOnUiThread(() -> btnAwaiting.setVisibility(View.GONE));
             validateWithBackend();
         } else {
-            successFakeCapture = Boolean.TRUE;
-            new CaptureThread().start();
-        }
+            if (successFakeCapture) {
+                runOnUiThread(() -> btnAwaiting.setVisibility(View.GONE));
+                validateWithBackend();
+            } else {
+                successFakeCapture = Boolean.TRUE; // SERGIO SICCHA -> CAMBIAR LOGICA DE DOBLE HUELLA
 
+                new Handler(Looper.getMainLooper()).postDelayed(() -> {
+                    if (BrandEnum.M.equals(device.getMarca())) {
+                        new MorphoCaptureThread().start();
+                    } else if (BrandEnum.H.equals(device.getMarca())) {
+                        new EikonCaptureThread().start();
+                    }
+                }, 1250);
+            }
+        }
     }
 
     public void showResult() {
@@ -445,25 +553,35 @@ public class CapturaHuellaActivity extends AppCompatActivity {
         finishAffinity();
     }
 
-    public void showInfoDialog(String title, String message, DialogInterface.OnClickListener listener) {
+    public void showErrorDialog(String title, String message, DialogInterface.OnClickListener listener) {
         dialogBuilder
             .setTitle(title)
             .setMessage(message)
             .setCancelable(false)
-            .setPositiveButton("Aceptar", listener)
+            .setPositiveButton(mContext.getString(R.string.btn_confirmation), listener)
             .create().show();
     }
 
     public void validateWithBackend() {
         dialogHandler.show(getSupportFragmentManager(), LOADING_DIALOG_TAG);
 
-        String fingerPrintBytes = Util.bytesToString(eikonManager.getFingerPrintBytes());
-        String deviceSerialNumber = eikonManager.getDeviceSerialNumber();
-        Integer captureScore = eikonManager.getCaptureScore();
+        String fingerPrintBytes = null;
+        String deviceSerialNumber = null;
+        Integer captureScore = null;
+
+        if (BrandEnum.M.equals(device.getMarca())) {
+            fingerPrintBytes = Util.bytesToString(morphoCapturedTemplate.getData());
+            deviceSerialNumber = morphoManager.getSerialNumber();
+            captureScore = morphoCapturedTemplate.getTemplateQuality();
+        } else if (BrandEnum.H.equals(device.getMarca())) {
+            fingerPrintBytes = Util.bytesToString(eikonManager.getFingerPrintBytes());
+            deviceSerialNumber = eikonManager.getDeviceSerialNumber();
+            captureScore = eikonManager.getCaptureScore();
+        }
 
         if (Objects.isNull(fingerPrintBytes) || Objects.isNull(deviceSerialNumber) || Objects.isNull(captureScore)) {
-            showInfoDialog("EIKON SDK - Device",
-                "Ocurrió un error al obtener los parámetros del dispositivo",
+            showErrorDialog(mContext.getString(R.string.title_device_manager),
+                mContext.getString(R.string.err_no_capture_parameters),
                 (dialog, which) -> finish());
             return;
         }
@@ -496,8 +614,7 @@ public class CapturaHuellaActivity extends AppCompatActivity {
 
                         if (ErrorReniecEnum.NO_HIT.getCode().equals(validacionResponse.getCodigoErrorReniec())) {
 
-                            // SERGIO SICCHA -> PARAMETRIZAR INTENTOS
-                            if (validacionResponse.getTotalIntentos() < 3) {
+                            if (validacionResponse.getIntentosPrimerFactor() < sessionConfig.getUserDetails().getNumeroIntentos()) {
 
                                 ++numberIntent;
                                 txtNumberIntent.setText(String.format(mContext.getString(R.string.txt_number_intent_desc), numberIntent.toString()));
@@ -516,8 +633,8 @@ public class CapturaHuellaActivity extends AppCompatActivity {
                                     .create().show();
 
                             } else {
-                                showInfoDialog("Validación Incorrecta",
-                                    "Ha agotado el total de intentos permitidos\npara realizar la validación dactilar",
+                                showErrorDialog(mContext.getString(R.string.app_name),
+                                    mContext.getString(R.string.err_nomore_intents),
                                     (dialog, which) -> finish());
                             }
 
@@ -527,29 +644,25 @@ public class CapturaHuellaActivity extends AppCompatActivity {
                     } else {
                         Log.e(LOG_TAG, "validateCapture.onResponse() -> No Success Code -> Ocurrió un error en VALIDATE FINGERPRINT");
                         closeDialog(Boolean.FALSE);
-                        showInfoDialog("ERROR",
-                            "Ocurrió un error durante la validación de la huella \n" +
-                                "Mensaje: " + response.body().getCabecera().getDescripcion(),
+                        showErrorDialog(mContext.getString(R.string.app_name),
+                            mContext.getString(R.string.err_validation),
                             (dialog, which) -> finish());
                     }
-
-
                 } else {
                     Log.e(LOG_TAG, "validateCapture -> Ocurrió un error durante la validación de huella.");
                     closeDialog(Boolean.FALSE);
-                    showInfoDialog("ERROR",
-                        "Ocurrió un error durante la validación de la huella",
+                    showErrorDialog(mContext.getString(R.string.app_name),
+                        mContext.getString(R.string.err_validation),
                         (dialog, which) -> finish());
                 }
-
             }
 
             @Override
             public void onFailure(Call<CommonResponse> call, Throwable t) {
                 Log.e(LOG_TAG, "validateCapture.onFailure() -> Falló la respuesta del servidor.");
                 closeDialog(Boolean.FALSE);
-                showInfoDialog("ERROR",
-                    "Ocurrió un error durante la validación de la huella",
+                showErrorDialog(mContext.getString(R.string.app_name),
+                    mContext.getString(R.string.err_validation),
                     (dialog, which) -> finish());
             }
         });
@@ -562,31 +675,23 @@ public class CapturaHuellaActivity extends AppCompatActivity {
 
             if (readers.size() < 1) {
                 Log.i(LOG_TAG, "deteccionHuellero() -> No Hay Huellero");
-                SweetAlertDialog a = new SweetAlertDialog(mContext, SweetAlertDialog.ERROR_TYPE);
-                a.setCancelable(false);
-                a.setCanceledOnTouchOutside(false);
-                a.setTitleText("EIKON Fingerprint SDK");
-                a.setConfirmText("OK");
-                a.setConfirmButtonTextColor(Color.WHITE);
-                a.setConfirmButtonBackgroundColor(Color.RED);
-                a.setContentText("¡La inicialización del scanner" +
-                    " de huellas digitales ha fallado!" + "\n" +
-                    "Conecte el scanner a su dispositivo");
-                a.setConfirmClickListener(sDialog -> {
-                    sDialog.dismiss();
 
-                    Intent intent = this.getIntent();
-                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK
-                        | Intent.FLAG_ACTIVITY_NO_ANIMATION);
-                    this.overridePendingTransition(0, 0);
-                    this.finish();
+                showErrorDialog(mContext.getString(R.string.title_device_manager),
+                    mContext.getString(R.string.err_device_not_detected),
+                    (dialog, which) -> {
+                        dialog.dismiss();
 
-                    this.overridePendingTransition(0, 0);
-                    startActivity(intent);
-                });
-                a.show();
+                        Intent intent = CapturaHuellaActivity.this.getIntent();
+                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK
+                            | Intent.FLAG_ACTIVITY_NO_ANIMATION);
+                        this.overridePendingTransition(0, 0);
+                        this.finish();
 
-                SessionConfig.getInstance().setReaderEnabled(Boolean.FALSE);
+                        this.overridePendingTransition(0, 0);
+                        startActivity(intent);
+                    });
+
+                sessionConfig.setReaderEnabled(Boolean.FALSE);
                 closeDialog(Boolean.FALSE);
 
                 return;
@@ -594,14 +699,14 @@ public class CapturaHuellaActivity extends AppCompatActivity {
 
             eikonManager.activateReader();
             eikonManager.getSerialNumber();
-            SessionConfig.getInstance().setReaderEnabled(Boolean.TRUE);
+            sessionConfig.setReaderEnabled(Boolean.TRUE);
 
             // Consultando mejores huellas
             getMejoresHuellas();
 
         } catch (Exception ex) {
             ex.printStackTrace();
-            SessionConfig.getInstance().setReaderEnabled(Boolean.FALSE);
+            sessionConfig.setReaderEnabled(Boolean.FALSE);
         }
     }
 
@@ -615,26 +720,18 @@ public class CapturaHuellaActivity extends AppCompatActivity {
                         Log.i(LOG_TAG, "BroadcastReceiver -> Device permission allowed");
                         dialogHandler.show(getSupportFragmentManager(), LOADING_DIALOG_TAG);
                         if (device != null) {
-                            SessionConfig.getInstance().setAllowedPermission(true);
+                            sessionConfig.setAllowedPermission(true);
                             deteccionHuellero();
                         }
                     } else {
                         Log.i(LOG_TAG, "BroadcastReceiver -> Device permission not allowed");
-                        SweetAlertDialog a = new SweetAlertDialog(context, SweetAlertDialog.ERROR_TYPE);
-                        a.setCancelable(false);
-                        a.setCanceledOnTouchOutside(false);
-                        a.setTitleText("EIKON Fingerprint SDK");
-                        a.setConfirmText("OK");
-                        a.setConfirmButtonTextColor(Color.WHITE);
-                        a.setConfirmButtonBackgroundColor(Color.RED);
-                        a.setContentText("¡No aceptó los permisos para\n" +
-                            " utilizar el lector de huellas digitales!");
-                        a.setConfirmClickListener(sDialog -> {
-                            sDialog.dismiss();
-                            finish();
-                            SessionConfig.getInstance().setAllowedPermission(false);
-                        });
-                        a.show();
+
+                        showErrorDialog(mContext.getString(R.string.title_device_manager),
+                            mContext.getString(R.string.err_permissions),
+                            (dialog, which) -> {
+                                sessionConfig.setAllowedPermission(false);
+                                finish();
+                            });
                     }
                     context.unregisterReceiver(captureUsbReceiver);
                 }

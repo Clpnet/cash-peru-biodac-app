@@ -33,7 +33,8 @@ public class ResponseObjectReniec implements Serializable {
     private String vigencia;
     private String restriccion;
     private String grupoRestriccion;
-    private Integer totalIntentos;
+    private Integer intentosPrimerFactor;
+    private Integer intentosSegundoFactor;
     private String identificadorTransaccion;
 
 }

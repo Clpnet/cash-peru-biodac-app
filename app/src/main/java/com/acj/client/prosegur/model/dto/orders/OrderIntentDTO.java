@@ -26,5 +26,6 @@ public class OrderIntentDTO implements Serializable {
 		private String fechaCreacion;
 		private String fechaModificacion;
 		private Integer idOrdenDetalle;
+		private String numeroFactor;
 
 }

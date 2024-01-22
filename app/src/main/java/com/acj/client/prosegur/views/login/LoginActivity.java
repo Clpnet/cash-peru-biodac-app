@@ -36,7 +36,7 @@ import java.util.Objects;
 
 public class LoginActivity extends AppCompatActivity {
 
-    private final String LOG_TAG = LoginActivity.class.getSimpleName();
+    private static final String LOG_TAG = LoginActivity.class.getSimpleName();
 
     private Button btnLogin;
     private Button btnLoginMicrosoft;
@@ -46,6 +46,15 @@ public class LoginActivity extends AppCompatActivity {
     private LoadingDialogFragment dialogHandler;
 
     private ISingleAccountPublicClientApplication mSingleAccountApp;
+
+    static {
+        try {
+            System.loadLibrary("MSO_Secu");
+        } catch (UnsatisfiedLinkError e) {
+            Log.e(LOG_TAG, "Exception in loadLibrary: " + e);
+            e.printStackTrace();
+        }
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

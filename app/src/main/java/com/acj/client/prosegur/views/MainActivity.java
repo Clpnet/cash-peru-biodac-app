@@ -1,8 +1,8 @@
 package com.acj.client.prosegur.views;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.Color;
 import android.os.Bundle;
 
 import com.acj.client.prosegur.R;
@@ -23,6 +23,7 @@ import com.acj.client.prosegur.views.login.LoginActivity;
 import com.google.android.material.appbar.AppBarLayout;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import androidx.appcompat.widget.PopupMenu;
@@ -30,6 +31,7 @@ import androidx.appcompat.widget.Toolbar;
 
 import android.os.Handler;
 import android.os.Looper;
+import android.provider.Settings;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -46,7 +48,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-import cn.pedant.SweetAlert.SweetAlertDialog;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -80,6 +81,9 @@ public class MainActivity extends AppCompatActivity {
 		private Boolean isDataLoaded;
 
 		private LoadingDialogFragment dialogHandler;
+
+		// Dialog
+		private AlertDialog.Builder dialogBuilder;
 
 		// Services
 		private UsuarioService usuarioService;
@@ -138,16 +142,17 @@ public class MainActivity extends AppCompatActivity {
 											} else {
 													Log.e(LOG_TAG, "onResponse() -> No Success Code -> Ocurrió un error en el GET USER DETAILS");
 													closeDialog(Boolean.FALSE);
-													showErrorDialog("Ocurrió un error en la consulta \n" +
-															"de datos de sesión del usuario \n" +
-															"Mensaje: " + response.body().getCabecera().getDescripcion());
+													runOnUiThread(() -> showErrorDialog(mContext.getString(R.string.app_name),
+															mContext.getString(R.string.err_get_session),
+															(dialog, which) -> exit()));
 											}
 
 									} else {
 											Log.e(LOG_TAG, "onResponse() -> succesful = false -> Ocurrió un error en el GET USER DETAILS");
 											closeDialog(Boolean.FALSE);
-											showErrorDialog("Ocurrió un error en la consulta \n" +
-													"de datos de sesión del usuario");
+											runOnUiThread(() -> showErrorDialog(mContext.getString(R.string.app_name),
+													mContext.getString(R.string.err_get_session),
+													(dialog, which) -> exit()));
 									}
 							}
 
@@ -155,8 +160,9 @@ public class MainActivity extends AppCompatActivity {
 							public void onFailure(Call<CommonResponse> call, Throwable t) {
 									Log.e(LOG_TAG, "onFailure() -> Ocurrió un error en el GET USER DETAILS. [" + t + "]");
 									closeDialog(Boolean.FALSE);
-									showErrorDialog("Ocurrió un error en la consulta \n" +
-											"de datos de sesión del usuario");
+									runOnUiThread(() -> showErrorDialog(mContext.getString(R.string.app_name),
+											mContext.getString(R.string.err_get_session),
+											(dialog, which) -> exit()));
 									t.printStackTrace();
 							}
 					});
@@ -186,15 +192,16 @@ public class MainActivity extends AppCompatActivity {
 												refreshContent(Boolean.TRUE);
 										} else {
 												Log.e(LOG_TAG, "onResponse() -> No Success Code -> Error controlado en GET ORDERS. Codigo " + response.body().getCabecera().getCodigo());
-												showErrorDialog("Ocurrió un error al consultar \n" +
-														"las ordenes para su usuario \n" +
-														"Mensaje: " + response.body().getCabecera().getDescripcion());
+												runOnUiThread(() -> showErrorDialog(mContext.getString(R.string.app_name),
+														mContext.getString(R.string.err_get_orders),
+														(dialog, which) -> exit()));
 										}
 								} else {
 										Log.e(LOG_TAG, "onResponse() -> succesful = false -> Ocurrió un error en el GET ORDERS");
 										closeDialog(Boolean.FALSE);
-										showErrorDialog("Ocurrió un error al consultar \n" +
-												"las ordenes para su usuario");
+										runOnUiThread(() -> showErrorDialog(mContext.getString(R.string.app_name),
+												mContext.getString(R.string.err_get_orders),
+												(dialog, which) -> exit()));
 								}
 						}
 
@@ -202,8 +209,9 @@ public class MainActivity extends AppCompatActivity {
 						public void onFailure(@NonNull Call<CommonResponse> call, @NonNull Throwable t) {
 								Log.e(LOG_TAG, "onFailure() -> Ocurrió un error en el GET ORDERS. [" + t + "]");
 								closeDialog(Boolean.FALSE);
-								showErrorDialog("Ocurrió un error en la consulta \n" +
-										"de ordenes del usuario");
+								runOnUiThread(() -> showErrorDialog(mContext.getString(R.string.app_name),
+										mContext.getString(R.string.err_get_orders),
+										(dialog, which) -> exit()));
 								t.printStackTrace();
 						}
 				});
@@ -229,6 +237,8 @@ public class MainActivity extends AppCompatActivity {
 				etxSearchBox = findViewById(R.id.searchEditText);
 
 				mContext = this;
+
+				dialogBuilder = new AlertDialog.Builder(MainActivity.this);
 
 				// Render content on fragment
 				OrderFragment orderFragment = new OrderFragment(mContext, new ArrayList<>());
@@ -277,6 +287,8 @@ public class MainActivity extends AppCompatActivity {
 				});
 
 				dialogHandler = new LoadingDialogFragment(MainActivity.this);
+
+				getImei();
 		}
 
 		private void refreshContent(Boolean isDataFromBack) {
@@ -361,20 +373,13 @@ public class MainActivity extends AppCompatActivity {
 				if (refresh) refreshContent(Boolean.FALSE);
 		}
 
-		private void showErrorDialog(String content) {
-				SweetAlertDialog a = new SweetAlertDialog(mContext, SweetAlertDialog.ERROR_TYPE);
-				a.setCancelable(false);
-				a.setCanceledOnTouchOutside(false);
-				a.setTitleText("ERROR");
-				a.setConfirmText("OK");
-				a.setConfirmButtonTextColor(Color.WHITE);
-				a.setConfirmButtonBackgroundColor(Color.RED);
-				a.setContentText(content);
-				a.setConfirmClickListener(sDialog -> {
-						sDialog.dismiss();
-						exit();
-				});
-				a.show();
+		public void showErrorDialog(String title, String message, DialogInterface.OnClickListener listener) {
+				dialogBuilder
+						.setTitle(title)
+						.setMessage(message)
+						.setCancelable(false)
+						.setPositiveButton(mContext.getString(R.string.btn_confirmation), listener)
+						.create().show();
 		}
 
 		public boolean optionItemSelected(MenuItem item) {
@@ -402,6 +407,15 @@ public class MainActivity extends AppCompatActivity {
 				}
 
 				return super.onOptionsItemSelected(item);
+		}
+
+		public void getImei() {
+				try {
+						String androidId = Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID);
+						Log.i(LOG_TAG, "androidId: " + androidId);
+				} catch (Exception e) {
+						Log.e(LOG_TAG, "Ocurrio un error al obtener el IMEI: " + e);
+				}
 		}
 
 		public void exit() {

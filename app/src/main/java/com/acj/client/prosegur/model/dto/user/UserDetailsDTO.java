@@ -28,5 +28,6 @@ public class UserDetailsDTO {
 	private List<SerialNumberDTO> movil;
 	private List<SerialNumberDTO> lector;
 	private String token;
+	private Integer numeroIntentos;
 
 }
