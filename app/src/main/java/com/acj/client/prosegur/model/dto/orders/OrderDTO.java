@@ -48,5 +48,6 @@ public class OrderDTO implements Serializable {
     private String tipoDocumento;
     private String usuario;
     private List<OrderIntentDTO> ordenesIntento;
+    private Boolean dobleConsulta;
 
 }

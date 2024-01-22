@@ -81,4 +81,20 @@
     <string name="hit_option_desc">Órdenes Hit (%s)</string>
     <string name="nohit_option_desc">Órdenes No Hit (%s)</string>
 
+    <!-- DIALOG TEXTS -->
+    <string name="title_device_manager">SDK MANAGER</string>
+    <string name="btn_confirmation">ACEPTAR</string>
+
+    <string name="err_get_session">Ocurrió un error en la consulta\nde datos de sesión del usuario</string>
+    <string name="err_get_orders">Ocurrió un error al consultar\nlas ordenes para su usuario</string>
+
+    <string name="err_permissions">¡No aceptó los permisos para\nutilizar el lector de huellas digitales!</string>
+    <string name="err_device_initialice">¡La inicialización del scanner de huellas digitales ha fallado!\nConecte el scanner a su dispositivo</string>
+    <string name="err_device_not_detected">¡No se encontró ningún lector!\nConecte el scanner a su dispositivo</string>
+    <string name="err_mh_search">Ocurrió un error en la búsqueda\nde las mejores huellas de la persona.\nError: %s</string>
+    <string name="err_capture">Ocurrió un error durante la captura de huella</string>
+    <string name="err_validation">Ocurrió un error durante la validación de la huella</string>
+    <string name="err_nomore_intents">Ha agotado el total de intentos permitidos\npara realizar la validación dactilar</string>
+    <string name="err_no_capture_parameters">Ocurrió un error al obtener los parámetros de la huella capturada</string>
+
 </resources>

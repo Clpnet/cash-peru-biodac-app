@@ -14,6 +14,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.acj.client.prosegur.R;
+import com.acj.client.prosegur.config.SessionConfig;
 import com.acj.client.prosegur.model.constant.OrderStateEnum;
 import com.acj.client.prosegur.model.dto.orders.OrderDTO;
 import com.acj.client.prosegur.views.adapter.OrderCustomAdapter;
@@ -83,7 +84,7 @@ public class OrderFragment extends Fragment implements OrderCustomAdapter.OnItem
 
         if (OrderStateEnum.Constants.PENDING_CODE.equals(currentOrder.getEstadoEntrega().getCode()) ||
             (OrderStateEnum.Constants.NO_HIT_CODE.equals(currentOrder.getEstadoEntrega().getCode()) &&
-                currentOrder.getOrdenesIntento().size() < 3)) {
+                currentOrder.getOrdenesIntento().size() < SessionConfig.getInstance().getUserDetails().getNumeroIntentos())) {
             Log.i(LOG_TAG, "Inicando proceso de captura");
 
             if (!isClicked) {

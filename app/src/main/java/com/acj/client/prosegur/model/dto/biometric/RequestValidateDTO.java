@@ -28,6 +28,9 @@ public class RequestValidateDTO {
     private Integer identificadorDedo;
     private String template;
     private Integer calidadCaptura;
+    private String numeroFactor;
+    private String latitud;
+    private String longitud;
 
 }
 
