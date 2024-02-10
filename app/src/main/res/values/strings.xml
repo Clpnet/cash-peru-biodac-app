@@ -75,6 +75,7 @@
     <string name="btn_captura_desc">CAPTURA</string>
     <string name="btn_espera_huella_desc">ESPERANDO HUELLA</string>
     <string name="btn_otra_consulta_desc">OTRA CONSULTA</string>
+    <string name="btn_otra_consulta_2_desc">CAPTURAR SEGUNDA HUELLA</string>
 
 
     <string name="pending_option_desc">Órdenes Pendientes (%s)</string>

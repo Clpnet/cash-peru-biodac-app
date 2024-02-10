@@ -3,6 +3,7 @@ package com.acj.client.prosegur.model.dto.orders;
 import com.acj.client.prosegur.model.constant.OrderStateEnum;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 import lombok.AllArgsConstructor;
@@ -49,5 +50,11 @@ public class OrderDTO implements Serializable {
     private String usuario;
     private List<OrderIntentDTO> ordenesIntento;
     private Boolean dobleConsulta;
+
+    // Variables Locales
+    private Boolean hasOneHit = Boolean.FALSE;
+    private Boolean hasTwoHit = Boolean.FALSE;
+    private List<OrderIntentDTO> intentosPrimerFactor = new ArrayList<>();
+    private List<OrderIntentDTO> intentosSegundoFactor = new ArrayList<>();
 
 }

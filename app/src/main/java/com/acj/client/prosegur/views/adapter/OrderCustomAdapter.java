@@ -140,7 +140,7 @@ public class OrderCustomAdapter extends RecyclerView.Adapter<OrderCustomAdapter.
 			} else if (OrderStateEnum.Constants.NO_HIT_CODE.equals(currentState.getCode())) {
 					int numberIntent = orden.getOrdenesIntento().size();
 
-					holder.txtLastIntentDate.setText( (numberIntent != 0)
+					holder.txtLastIntentDate.setText((numberIntent != 0)
 							? orden.getOrdenesIntento().get(0).getFechaCreacion()
 							: StringUtils.EMPTY);
 					holder.lblLastIntentDate.setVisibility((numberIntent != 0) ? View.VISIBLE : View.GONE);

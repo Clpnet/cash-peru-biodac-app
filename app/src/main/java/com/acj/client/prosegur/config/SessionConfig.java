@@ -27,6 +27,7 @@ public class SessionConfig {
 
     // Session Data
     private UserDetailsDTO userDetails;
+    private Integer numberIntents;
     private String imei;
 
     // Order Data
