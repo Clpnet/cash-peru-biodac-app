@@ -38,6 +38,7 @@ import com.acj.client.prosegur.config.EikonManager;
 import com.acj.client.prosegur.model.constant.EnumExtra;
 import com.acj.client.prosegur.R;
 import com.acj.client.prosegur.config.SessionConfig;
+import com.acj.client.prosegur.model.dto.orders.OrderIntentDTO;
 import com.acj.client.prosegur.model.dto.user.SerialNumberDTO;
 import com.acj.client.prosegur.util.Util;
 import com.acj.client.prosegur.model.dto.biometric.RequestValidateDTO;
@@ -70,6 +71,8 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
+import static com.acj.client.prosegur.util.Constants.FACTOR_01;
+import static com.acj.client.prosegur.util.Constants.FACTOR_02;
 import static com.acj.client.prosegur.util.Constants.LOADING_DIALOG_TAG;
 import static com.acj.client.prosegur.util.Util.killSessionOnMicrosoft;
 
@@ -136,11 +139,10 @@ public class CapturaHuellaActivity extends AppCompatActivity implements Observer
     private SerialNumberDTO device;
     private ResponseObjectReniec mejoresHuellasResponse;
     private ResponseObjectReniec validacionResponse;
-    private Integer numberIntent;
 
     // Variables de Control
     private Boolean successFakeCapture = Boolean.FALSE;
-    private Boolean successFirstFinger = Boolean.FALSE;
+    private Integer numberIntent;
 
     private Context mContext;
 
@@ -181,8 +183,6 @@ public class CapturaHuellaActivity extends AppCompatActivity implements Observer
 
         device = !sessionConfig.getUserDetails().getLector().isEmpty()
             ? sessionConfig.getUserDetails().getLector().get(0) : null;
-
-        currentOrder.setDobleConsulta(Boolean.FALSE); // SERGIO SICCHA -> QUITAR
 
         setOrderContent();
 
@@ -278,12 +278,28 @@ public class CapturaHuellaActivity extends AppCompatActivity implements Observer
             beginDeviceCapture();
         });
 
-        btnOtraConsulta.setOnClickListener(view -> finish());
+        btnOtraConsulta.setOnClickListener(view -> {
+            Log.i(LOG_TAG, "Click on btnOtraConsulta");
+
+            if (currentOrder.getDobleConsulta()) {
+                if (currentOrder.getHasTwoHit()) {
+                    finish();
+                } else {
+                    updateCaptureButtonState(Boolean.FALSE);
+                    beginDeviceCapture();
+                }
+            } else {
+                finish();
+            }
+
+        });
 
         dialogHandler = new LoadingDialogFragment(CapturaHuellaActivity.this);
     }
 
     private void beginDeviceCapture() {
+        if(View.VISIBLE == lytResultados.getVisibility()) lytResultados.setVisibility(View.GONE);
+
         if (BrandEnum.M.equals(device.getMarca())) {
             int activationResult = morphoManager.activateReader(CapturaHuellaActivity.this);
             if (activationResult == 0)  {
@@ -298,6 +314,47 @@ public class CapturaHuellaActivity extends AppCompatActivity implements Observer
         }
     }
 
+    private void validateFingerIntents() {
+        if (!currentOrder.getOrdenesIntento().isEmpty() && !currentOrder.getHasOneHit()) {
+            OrderIntentDTO firstIntent = currentOrder.getIntentosPrimerFactor().get(0);
+
+            boolean isLeftFinger = firstIntent.getNumeroDedo().equals(Integer.valueOf(mejoresHuellasResponse.getMejorHuellaIzquierda()));
+
+            imgManoIzq.setImageResource(FingerEnum.getFinderByCod(mejoresHuellasResponse.getMejorHuellaIzquierda()).getImage());
+            imgManoDer.setImageResource(FingerEnum.getFinderByCod(mejoresHuellasResponse.getMejorHuellaDerecha()).getImage());
+
+            if (isLeftFinger) {
+                // SERGIO SICCHA -> ORDENAR
+                btnCapturaIzq.setEnabled(Boolean.TRUE);
+                btnCapturaIzq.setClickable(Boolean.TRUE);
+            } else {
+                // SERGIO SICCHA -> ORDENAR
+                btnCapturaDer.setEnabled(Boolean.TRUE);
+                btnCapturaDer.setClickable(Boolean.TRUE);
+            }
+        } else if (currentOrder.getHasOneHit()) {
+            OrderIntentDTO hitTransaction = currentOrder.getIntentosPrimerFactor().stream()
+                .filter(intent -> ErrorReniecEnum.HIT.getCode().toString().equals(intent.getNumero()))
+                .findFirst().orElse(null);
+
+            boolean isLeftFinger = hitTransaction.getNumeroDedo().equals(Integer.valueOf(mejoresHuellasResponse.getMejorHuellaIzquierda()));
+
+            if (isLeftFinger) {
+                // SERGIO SICCHA -> ORDENAR
+                btnCapturaDer.setEnabled(Boolean.TRUE);
+                btnCapturaDer.setClickable(Boolean.TRUE);
+                imgManoIzq.setImageResource(R.drawable.ic_manoizquierda);
+            } else {
+                // SERGIO SICCHA -> ORDENAR
+                btnCapturaIzq.setEnabled(Boolean.TRUE);
+                btnCapturaIzq.setClickable(Boolean.TRUE);
+                imgManoDer.setImageResource(R.drawable.ic_manoderecha);
+            }
+        } else {
+            updateCaptureButtonState(Boolean.TRUE);
+        }
+    }
+
     private void setOrderContent() {
         txtOrderNumber.setText(currentOrder.getCodigoOperacion());
         txtOrderType.setText(currentOrder.getTipoOrden());
@@ -308,12 +365,11 @@ public class CapturaHuellaActivity extends AppCompatActivity implements Observer
         if (numberIntent != 0) txtNumberIntent.setVisibility(View.VISIBLE);
     }
 
-    private void updateCaptureButtonState(Boolean enabled) {
-        btnCapturaIzq.setEnabled(enabled);
-        btnCapturaDer.setEnabled(enabled);
-
-        btnCapturaIzq.setClickable(enabled);
-        btnCapturaDer.setClickable(enabled);
+    private void updateCaptureButtonState(Boolean newState) {
+        btnCapturaIzq.setEnabled(newState);
+        btnCapturaDer.setEnabled(newState);
+        btnCapturaIzq.setClickable(newState);
+        btnCapturaDer.setClickable(newState);
     }
 
     private void getMejoresHuellas() {
@@ -333,7 +389,11 @@ public class CapturaHuellaActivity extends AppCompatActivity implements Observer
                         imgManoIzq.setImageResource(FingerEnum.getFinderByCod(mejoresHuellasResponse.getMejorHuellaIzquierda()).getImage());
                         imgManoDer.setImageResource(FingerEnum.getFinderByCod(mejoresHuellasResponse.getMejorHuellaDerecha()).getImage());
 
-                        updateCaptureButtonState(Boolean.TRUE);
+                        if (currentOrder.getDobleConsulta()) {
+                            validateFingerIntents();
+                        } else {
+                            updateCaptureButtonState(Boolean.TRUE);
+                        }
 
                         closeDialog(Boolean.TRUE);
                     } else {
@@ -467,17 +527,17 @@ public class CapturaHuellaActivity extends AppCompatActivity implements Observer
                     final int NbTemplate = templateList.getNbTemplate();
                     if (NbTemplate > 0) {
                         morphoCapturedTemplate = templateList.getTemplate(0);
+                        validateCapturedFingerprint();
                     } else {
                         runOnUiThread(() -> showErrorDialog(mContext.getString(R.string.app_name),
                             mContext.getString(R.string.err_capture),
-                            (dialog, which) -> updateCaptureButtonState(Boolean.TRUE)));
+                            (dialog, which) -> finish()));
                     }
                     morphoDevice.cancelLiveAcquisition();
-                    validateCapturedFingerprint();
                 } else {
                     runOnUiThread(() -> showErrorDialog(mContext.getString(R.string.app_name),
                         mContext.getString(R.string.err_capture),
-                        (dialog, which) -> updateCaptureButtonState(Boolean.TRUE)));
+                        (dialog, which) -> finish()));
                 }
 
                 Looper.loop();
@@ -488,16 +548,29 @@ public class CapturaHuellaActivity extends AppCompatActivity implements Observer
         }
     }
 
+    // SERGIO SICCHA -> REVISAR
+    public void enableButtonOnError() {
+        if (ButtonEnum.IZQ.equals(buttonPressed)) {
+            // SERGIO SICCHA -> ORDENAR
+            btnCapturaIzq.setEnabled(Boolean.TRUE);
+            btnCapturaIzq.setClickable(Boolean.TRUE);
+        } else {
+            // SERGIO SICCHA -> ORDENAR
+            btnCapturaDer.setEnabled(Boolean.TRUE);
+            btnCapturaDer.setClickable(Boolean.TRUE);
+        }
+    }
+
     public void fingerprintCaptureValidation() {
         runOnUiThread(() -> {
-            if (Boolean.TRUE) {
+            if (currentOrder.getDobleConsulta()) {
+                btnAwaiting.setText(StringUtils.joinWith(StringUtils.SPACE, mContext.getString(R.string.btn_espera_huella_desc), buttonPressed.getDescription()));
+            } else {
                 Log.i(LOG_TAG, "fingerprintCaptureValidation() -> Fake Capture " + successFakeCapture);
                 btnAwaiting.setText( StringUtils.joinWith(StringUtils.SPACE, mContext.getString(R.string.btn_espera_huella_desc),
                     (!successFakeCapture)
                         ? (ButtonEnum.IZQ.equals(buttonPressed)) ? ButtonEnum.DER.getDescription() : ButtonEnum.IZQ.getDescription()
                         : buttonPressed.getDescription()));
-            } else {
-                btnAwaiting.setText(StringUtils.joinWith(StringUtils.SPACE, mContext.getString(R.string.btn_espera_huella_desc), buttonPressed.getDescription()));
             }
 
             btnAwaiting.setVisibility(View.VISIBLE);
@@ -511,14 +584,14 @@ public class CapturaHuellaActivity extends AppCompatActivity implements Observer
 
     public void validateCapturedFingerprint() {
         if (currentOrder.getDobleConsulta()) {
-            if (successFirstFinger) runOnUiThread(() -> btnAwaiting.setVisibility(View.GONE));
+            runOnUiThread(() -> btnAwaiting.setVisibility(View.GONE));
             validateWithBackend();
         } else {
             if (successFakeCapture) {
                 runOnUiThread(() -> btnAwaiting.setVisibility(View.GONE));
                 validateWithBackend();
             } else {
-                successFakeCapture = Boolean.TRUE; // SERGIO SICCHA -> CAMBIAR LOGICA DE DOBLE HUELLA
+                successFakeCapture = Boolean.TRUE;
 
                 new Handler(Looper.getMainLooper()).postDelayed(() -> {
                     if (BrandEnum.M.equals(device.getMarca())) {
@@ -531,7 +604,16 @@ public class CapturaHuellaActivity extends AppCompatActivity implements Observer
         }
     }
 
-    public void showResult() {
+    public void showResult(String factor) {
+        if (FACTOR_01.equals(factor)) {
+            btnOtraConsulta.setText(mContext.getString(R.string.btn_otra_consulta_2_desc));
+        } else {
+            btnOtraConsulta.setText(mContext.getString(R.string.btn_otra_consulta_desc));
+            updateCaptureButtonState(Boolean.FALSE);
+            imgManoIzq.setImageResource(R.drawable.ic_manoizquierda);
+            imgManoDer.setImageResource(R.drawable.ic_manoderecha);
+        }
+
         txtResultDocumentNumber.setText(currentOrder.getNumeroDocumento());
         txtResultCode.setText(StringUtils.join(validacionResponse.getCodigoErrorReniec(), ":"));
         txtResultDescription.setText(validacionResponse.getDescripcionErrorReniec());
@@ -540,7 +622,6 @@ public class CapturaHuellaActivity extends AppCompatActivity implements Observer
         txtResultApMaterno.setText(currentOrder.getApellidoMaterno());
         txtResultIdTransaccion.setText(validacionResponse.getIdentificadorTransaccion());
 
-        updateCaptureButtonState(Boolean.FALSE);
         lytResultados.setVisibility(View.VISIBLE);
     }
 
@@ -594,6 +675,12 @@ public class CapturaHuellaActivity extends AppCompatActivity implements Observer
             : Integer.valueOf(mejoresHuellasResponse.getMejorHuellaDerecha()));
         requestValidateDTO.setTemplate(fingerPrintBytes);
         requestValidateDTO.setCalidadCaptura(captureScore);
+        requestValidateDTO.setLatitud(null) ; // SERGIO SICCHA -> COMPLETAR
+        requestValidateDTO.setLongitud(null); // SERGIO SICCHA -> COMPLETAR
+
+        if (currentOrder.getDobleConsulta()) {
+            requestValidateDTO.setNumeroFactor((!currentOrder.getHasOneHit()) ? FACTOR_01 : FACTOR_02);
+        }
 
         Log.i(LOG_TAG, "validateFingerprint() -> Validate Capture Request [" + requestValidateDTO + "]");
 
@@ -612,34 +699,124 @@ public class CapturaHuellaActivity extends AppCompatActivity implements Observer
 
                         closeDialog(Boolean.TRUE);
 
-                        if (ErrorReniecEnum.NO_HIT.getCode().equals(validacionResponse.getCodigoErrorReniec())) {
+                        if (currentOrder.getDobleConsulta()) {
 
-                            if (validacionResponse.getIntentosPrimerFactor() < sessionConfig.getUserDetails().getNumeroIntentos()) {
+                            if (ErrorReniecEnum.NO_HIT.getCode().equals(validacionResponse.getCodigoErrorReniec())) {
 
                                 ++numberIntent;
                                 txtNumberIntent.setText(String.format(mContext.getString(R.string.txt_number_intent_desc), numberIntent.toString()));
                                 if (View.INVISIBLE == txtNumberIntent.getVisibility())
                                     txtNumberIntent.setVisibility(View.VISIBLE);
 
-                                dialogBuilder
-                                    .setTitle("AVISO")
-                                    .setMessage("Validación Incorrecta\n¿Desea reintentar?")
-                                    .setCancelable(false)
-                                    .setPositiveButton("SI", (dialog, which) -> {
-                                        successFakeCapture = Boolean.FALSE;
-                                        updateCaptureButtonState(Boolean.TRUE);
-                                    })
-                                    .setNegativeButton("NO", (dialog, which) -> finish())
-                                    .create().show();
+                                if (validacionResponse.getIntentosSegundoFactor() > 0 &&
+                                    validacionResponse.getIntentosSegundoFactor() < sessionConfig.getNumberIntents()) { // Si ya se validó la primera huella e intentos < VALOR
 
-                            } else {
-                                showErrorDialog(mContext.getString(R.string.app_name),
-                                    mContext.getString(R.string.err_nomore_intents),
-                                    (dialog, which) -> finish());
+                                    dialogBuilder
+                                        .setTitle("AVISO")
+                                        .setMessage("Validación Incorrecta\n¿Desea reintentar?")
+                                        .setCancelable(false)
+                                        .setPositiveButton("SI", (dialog, which) -> {
+                                            if (ButtonEnum.IZQ.equals(buttonPressed)) {
+                                                // SERGIO SICCHA -> ORDENAR
+                                                btnCapturaIzq.setEnabled(Boolean.TRUE);
+                                                btnCapturaIzq.setClickable(Boolean.TRUE);
+                                            } else {
+                                                // SERGIO SICCHA -> ORDENAR
+                                                btnCapturaDer.setEnabled(Boolean.TRUE);
+                                                btnCapturaDer.setClickable(Boolean.TRUE);
+                                            }
+                                        })
+                                        .setNegativeButton("NO", (dialog, which) -> finish())
+                                        .create().show();
+
+                                } else if (validacionResponse.getIntentosSegundoFactor() == 0 &&
+                                    validacionResponse.getIntentosPrimerFactor() < sessionConfig.getNumberIntents()) { // Si ya esta en la primera huella e intentos < VALOR
+
+                                    dialogBuilder
+                                        .setTitle("AVISO")
+                                        .setMessage("Validación Incorrecta\n¿Desea reintentar?")
+                                        .setCancelable(false)
+                                        .setPositiveButton("SI", (dialog, which) -> {
+                                            if (ButtonEnum.IZQ.equals(buttonPressed)) {
+                                                // SERGIO SICCHA -> ORDENAR
+                                                btnCapturaIzq.setEnabled(Boolean.TRUE);
+                                                btnCapturaIzq.setClickable(Boolean.TRUE);
+                                            } else {
+                                                // SERGIO SICCHA -> ORDENAR
+                                                btnCapturaDer.setEnabled(Boolean.TRUE);
+                                                btnCapturaDer.setClickable(Boolean.TRUE);
+                                            }
+                                        })
+                                        .setNegativeButton("NO", (dialog, which) -> finish())
+                                        .create().show();
+
+                                } else {
+                                    showErrorDialog(mContext.getString(R.string.app_name),
+                                        mContext.getString(R.string.err_nomore_intents),
+                                        (dialog, which) -> finish());
+                                }
+
+                            } else if (ErrorReniecEnum.HIT.getCode().equals(validacionResponse.getCodigoErrorReniec())) {
+
+                                if (FACTOR_01.equals(requestValidateDTO.getNumeroFactor())) {
+                                    currentOrder.setHasOneHit(Boolean.TRUE); // Hizo el primer HIT
+
+                                    boolean isLeftFinger = requestValidateDTO.getIdentificadorDedo().equals(Integer.valueOf(mejoresHuellasResponse.getMejorHuellaIzquierda()));
+
+                                    if (isLeftFinger) {
+                                        // SERGIO SICCHA -> ORDENAR
+                                        buttonPressed = ButtonEnum.DER;
+                                        btnCapturaDer.setEnabled(Boolean.TRUE);
+                                        btnCapturaDer.setClickable(Boolean.TRUE);
+                                        imgManoIzq.setImageResource(R.drawable.ic_manoizquierda);
+                                    } else {
+                                        // SERGIO SICCHA -> ORDENAR
+                                        buttonPressed = ButtonEnum.IZQ;
+                                        btnCapturaIzq.setEnabled(Boolean.TRUE);
+                                        btnCapturaIzq.setClickable(Boolean.TRUE);
+                                        imgManoDer.setImageResource(R.drawable.ic_manoderecha);
+                                    }
+
+                                    showResult(FACTOR_01);
+
+                                } else {
+                                    currentOrder.setHasTwoHit(Boolean.TRUE);
+                                    showResult(FACTOR_02);
+                                }
                             }
 
-                        } else if (ErrorReniecEnum.HIT.getCode().equals(validacionResponse.getCodigoErrorReniec())) {
-                            showResult();
+                        } else {
+
+                            if (ErrorReniecEnum.NO_HIT.getCode().equals(validacionResponse.getCodigoErrorReniec())) {
+
+                                ++numberIntent;
+                                txtNumberIntent.setText(String.format(mContext.getString(R.string.txt_number_intent_desc), numberIntent.toString()));
+                                if (View.INVISIBLE == txtNumberIntent.getVisibility())
+                                    txtNumberIntent.setVisibility(View.VISIBLE);
+
+                                if (validacionResponse.getIntentosPrimerFactor() < sessionConfig.getNumberIntents()) {
+
+                                    dialogBuilder
+                                        .setTitle("AVISO")
+                                        .setMessage("Validación Incorrecta\n¿Desea reintentar?")
+                                        .setCancelable(false)
+                                        .setPositiveButton("SI", (dialog, which) -> {
+                                            successFakeCapture = Boolean.FALSE;
+                                            updateCaptureButtonState(Boolean.TRUE);
+                                        })
+                                        .setNegativeButton("NO", (dialog, which) -> finish())
+                                        .create().show();
+
+                                } else {
+                                    showErrorDialog(mContext.getString(R.string.app_name),
+                                        mContext.getString(R.string.err_nomore_intents),
+                                        (dialog, which) -> finish());
+                                }
+
+                            } else if (ErrorReniecEnum.HIT.getCode().equals(validacionResponse.getCodigoErrorReniec())) {
+                                showResult(null);
+                            }
+
                         }
                     } else {
                         Log.e(LOG_TAG, "validateCapture.onResponse() -> No Success Code -> Ocurrió un error en VALIDATE FINGERPRINT");

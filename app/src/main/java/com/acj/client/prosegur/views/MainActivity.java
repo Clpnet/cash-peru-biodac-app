@@ -89,6 +89,9 @@ public class MainActivity extends AppCompatActivity {
 		private UsuarioService usuarioService;
 		private OrderService orderService;
 
+		// Variables globales
+		private String deviceName;
+
 		@Override
 		protected void onCreate(Bundle savedInstanceState) {
 				super.onCreate(savedInstanceState);
@@ -137,6 +140,7 @@ public class MainActivity extends AppCompatActivity {
 													txtWelcome.setVisibility(View.VISIBLE);
 
 													SessionConfig.getInstance().setUserDetails(userDetails);
+													SessionConfig.getInstance().setNumberIntents(userDetails.getNumeroIntentos());
 
 													findOrders();
 											} else {
@@ -237,6 +241,10 @@ public class MainActivity extends AppCompatActivity {
 				etxSearchBox = findViewById(R.id.searchEditText);
 
 				mContext = this;
+
+				deviceName = Settings.Global.getString(mContext.getContentResolver(), Settings.Global.DEVICE_NAME);
+
+				Log.i(LOG_TAG, "Device Name: " + deviceName);
 
 				dialogBuilder = new AlertDialog.Builder(MainActivity.this);
 

@@ -20,6 +20,7 @@ public class OrderIntentDTO implements Serializable {
 		private Integer idOrdenIntento;
 		private String numero;
 		private String descripcion;
+		private Integer numeroDedo;
 		private String estado;
 		private String usuarioCreacion;
 		private String usuarioModificacion;

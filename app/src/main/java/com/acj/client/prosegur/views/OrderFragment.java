@@ -15,6 +15,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.acj.client.prosegur.R;
 import com.acj.client.prosegur.config.SessionConfig;
+import com.acj.client.prosegur.model.constant.ErrorReniecEnum;
 import com.acj.client.prosegur.model.constant.OrderStateEnum;
 import com.acj.client.prosegur.model.dto.orders.OrderDTO;
 import com.acj.client.prosegur.views.adapter.OrderCustomAdapter;
@@ -23,6 +24,10 @@ import com.acj.client.prosegur.views.captura.CapturaHuellaActivity;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
+
+import static com.acj.client.prosegur.util.Constants.FACTOR_01;
+import static com.acj.client.prosegur.util.Constants.FACTOR_02;
 
 public class OrderFragment extends Fragment implements OrderCustomAdapter.OnItemClickListener {
 
@@ -82,9 +87,40 @@ public class OrderFragment extends Fragment implements OrderCustomAdapter.OnItem
 
         Log.i(LOG_TAG, "Validando proceso de captura para la orden [" + currentOrder.getCodigoOperacion() + "]");
 
+        // SERGIO SICCHA -> BORRAR
+        /*OrderIntentDTO primer = new OrderIntentDTO();
+        primer.setNumeroFactor("1");
+        primer.setNumero("70007");
+
+        OrderIntentDTO segundo = new OrderIntentDTO();
+        segundo.setNumeroFactor("1");
+        segundo.setNumero("70007");
+
+        OrderIntentDTO tercer = new OrderIntentDTO();
+        tercer.setNumeroFactor("1");
+        segundo.setNumero("70006");
+
+        OrderIntentDTO primerS = new OrderIntentDTO();
+        primerS.setNumeroFactor("2");
+        primerS.setNumero("70007");
+
+        OrderIntentDTO segundoS = new OrderIntentDTO();
+        segundoS.setNumeroFactor("2");
+        segundoS.setNumero("70007");
+
+        OrderIntentDTO tercerS = new OrderIntentDTO();
+        tercerS.setNumeroFactor("2");
+        tercerS.setNumero("70006");
+
+        currentOrder.setDobleConsulta(Boolean.TRUE);
+        currentOrder.setOrdenesIntento(Arrays.asList(primer, segundo, tercer, primerS, segundoS, tercerS));*/
+
         if (OrderStateEnum.Constants.PENDING_CODE.equals(currentOrder.getEstadoEntrega().getCode()) ||
             (OrderStateEnum.Constants.NO_HIT_CODE.equals(currentOrder.getEstadoEntrega().getCode()) &&
-                currentOrder.getOrdenesIntento().size() < SessionConfig.getInstance().getUserDetails().getNumeroIntentos())) {
+                ((!currentOrder.getDobleConsulta() &&
+                    currentOrder.getOrdenesIntento().size() < SessionConfig.getInstance().getNumberIntents()) ||
+                    (currentOrder.getDobleConsulta() && doubleValidationConditions(currentOrder))))
+        ) {
             Log.i(LOG_TAG, "Inicando proceso de captura");
 
             if (!isClicked) {
@@ -97,6 +133,26 @@ public class OrderFragment extends Fragment implements OrderCustomAdapter.OnItem
         } else {
             Log.i(LOG_TAG, "Orden no apta para iniciar el proceso de captura.");
         }
+    }
+
+    private Boolean doubleValidationConditions(OrderDTO orderDTO) {
+        orderDTO.setIntentosPrimerFactor(orderDTO.getOrdenesIntento().stream()
+            .filter(intent -> FACTOR_01.equals(intent.getNumeroFactor()))
+            .collect(Collectors.toList()));
+
+        orderDTO.setIntentosSegundoFactor(orderDTO.getOrdenesIntento().stream()
+            .filter(intent -> FACTOR_02.equals(intent.getNumeroFactor()))
+            .collect(Collectors.toList()));
+
+        orderDTO.setHasOneHit(orderDTO.getIntentosPrimerFactor().stream()
+            .anyMatch(intent -> ErrorReniecEnum.HIT.getCode().toString().equals(intent.getNumero())));
+
+        Log.i(LOG_TAG, "Intentos primer factor: " + orderDTO.getIntentosPrimerFactor());
+        Log.i(LOG_TAG, "Intentos segundo factor: " + orderDTO.getIntentosSegundoFactor());
+        Log.i(LOG_TAG, "Hizo el primer HIT: " + orderDTO.getHasOneHit());
+
+        return ((!orderDTO.getHasOneHit() && orderDTO.getIntentosPrimerFactor().size() < SessionConfig.getInstance().getNumberIntents()) ||
+            (orderDTO.getHasOneHit() && orderDTO.getIntentosSegundoFactor().size() < SessionConfig.getInstance().getNumberIntents()));
     }
 
     @Override
