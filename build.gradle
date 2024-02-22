@@ -16,14 +16,14 @@ plugins {
 
 android{
 
-     buildTypes {
+  buildTypes {
         release {
-            // Configuración específica para la versión de lanzamiento
-            minifyEnabled false // Si deseas habilitar la minificación, cámbialo a true
-            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro' // Configuración de ProGuard
+            // Habilitar la minificación y la ofuscación
+            minifyEnabled true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
             
-            signingConfig signingConfigs.release // Configuración de firmado de APK
-       
+            // Configuración de firmado
+            signingConfig signingConfigs.release
         }
     }
 }
