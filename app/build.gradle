@@ -1,0 +1,75 @@
+plugins {
+    id 'com.android.application'
+}
+
+android {
+    namespace 'com.acj.client.prosegur'
+    compileSdk 33
+
+    sourceSets {
+        main {
+            jniLibs.srcDirs = ['libs']
+        }
+    }
+
+    defaultConfig {
+        applicationId "com.acj.client.prosegur"
+        minSdk 27
+        targetSdk 33
+        versionCode 1
+        versionName "1.0"
+
+        testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+    buildFeatures {
+        viewBinding true
+    }
+}
+
+dependencies {
+
+    implementation 'androidx.appcompat:appcompat:1.0.0'
+    implementation 'com.google.android.material:material:1.8.0'
+    implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
+    implementation 'androidx.navigation:navigation-fragment:2.0.0-rc02'
+    implementation 'androidx.navigation:navigation-ui:2.0.0-rc02'
+    implementation 'androidx.legacy:legacy-support-v4:1.0.0'
+    implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.5.1'
+    implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.5.1'
+    testImplementation 'junit:junit:4.13.2'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.1'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
+
+    implementation 'com.squareup.retrofit2:retrofit:2.7.2'
+    implementation 'com.squareup.retrofit2:converter-gson:2.7.2'
+
+    compileOnly "org.projectlombok:lombok:1.18.28"
+    annotationProcessor 'org.projectlombok:lombok:1.18.28'
+
+    implementation 'com.google.code.gson:gson:2.8.6'
+
+    // Microsoft Entra
+    implementation 'com.microsoft.identity.client:msal:4.5.0'
+
+    // Glide - Gifview library
+    implementation 'com.github.bumptech.glide:glide:4.12.0'
+    annotationProcessor 'com.github.bumptech.glide:compiler:4.12.0'
+
+    // Apache Commong Lang 3
+    implementation 'org.apache.commons:commons-lang3:3.13.0'
+
+    //implementation files('libs/dpuareu.jar')
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+
+}

@@ -7,8 +7,8 @@ app/build/
 build/
 
 # Archivos generados por el sistema de construcción de Gradle
-build.gradle
-local.properties
+#build.gradle
+#local.properties
 
 # Archivos de configuración de Gradle
 /.gradle/
