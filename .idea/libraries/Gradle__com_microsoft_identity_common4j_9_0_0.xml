@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="Gradle: com.microsoft.identity:common4j:9.0.0">
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.microsoft.identity/common4j/9.0.0/34aec1637c032f9c91b20016dc93037e987037a8/common4j-9.0.0.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.microsoft.identity/common4j/9.0.0/dd13c6cbad124cfec1405e7fe6b00e063a4c7b70/common4j-9.0.0-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.microsoft.identity/common4j/9.0.0/935cd6cd8a9259e0423b52a7a981de0792d1ba0d/common4j-9.0.0-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

@@ -1,0 +1,35 @@
+<project version="4">
+  <component name="DesignSurface">
+    <option name="filePathToZoomLevelMap">
+      <map>
+        <entry key="..\:/PROYECTOS-ACJ/ACJ-PROSEGUR/MOVIL-V2/movil/app/src/main/res/drawable/button_alert.xml" value="0.172" />
+        <entry key="..\:/PROYECTOS-ACJ/ACJ-PROSEGUR/MOVIL-V2/movil/app/src/main/res/drawable/button_border.xml" value="0.172" />
+        <entry key="..\:/PROYECTOS-ACJ/ACJ-PROSEGUR/MOVIL-V2/movil/app/src/main/res/drawable/button_success.xml" value="0.172" />
+        <entry key="..\:/PROYECTOS-ACJ/ACJ-PROSEGUR/MOVIL-V2/movil/app/src/main/res/layout/activity_captura_huella.xml" value="0.25" />
+        <entry key="..\:/PROYECTOS-ACJ/ACJ-PROSEGUR/MOVIL-V2/movil/app/src/main/res/layout/activity_login.xml" value="0.20416666666666666" />
+        <entry key="..\:/PROYECTOS-ACJ/ACJ-PROSEGUR/MOVIL-V2/movil/app/src/main/res/layout/activity_main.xml" value="0.22" />
+        <entry key="..\:/PROYECTOS-ACJ/ACJ-PROSEGUR/MOVIL-V2/movil/app/src/main/res/layout/alert_dialog.xml" value="0.33" />
+        <entry key="..\:/PROYECTOS-ACJ/ACJ-PROSEGUR/MOVIL-V2/movil/app/src/main/res/layout/fragment_first.xml" value="0.20416666666666666" />
+        <entry key="..\:/PROYECTOS-ACJ/ACJ-PROSEGUR/MOVIL-V2/movil/app/src/main/res/layout/fragment_second.xml" value="0.25" />
+        <entry key="..\:/PROYECTOS-ACJ/ACJ-PROSEGUR/MOVIL-V2/movil/app/src/main/res/layout/fragment_third.xml" value="0.20416666666666666" />
+        <entry key="..\:/PROYECTOS-ACJ/ACJ-PROSEGUR/MOVIL-V2/movil/app/src/main/res/layout/hit_nohit_cardview.xml" value="0.5" />
+        <entry key="..\:/PROYECTOS-ACJ/ACJ-PROSEGUR/MOVIL-V2/movil/app/src/main/res/layout/pendientes_cardview.xml" value="0.33" />
+        <entry key="..\:/PROYECTOS-ACJ/ACJ-PROSEGUR/MOVIL-V2/movil/app/src/main/res/menu/menu_main.xml" value="0.16666666666666666" />
+      </map>
+    </option>
+  </component>
+  <component name="ExternalStorageConfigurationManager" enabled="true" />
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_17" default="true" project-jdk-name="jbr-17" project-jdk-type="JavaSDK">
+    <output url="file://$PROJECT_DIR$/build/classes" />
+  </component>
+  <component name="ProjectType">
+    <option name="id" value="Android" />
+  </component>
+  <component name="VisualizationToolProject">
+    <option name="state">
+      <ProjectState>
+        <option name="scale" value="0.1961206896551724" />
+      </ProjectState>
+    </option>
+  </component>
+</project>

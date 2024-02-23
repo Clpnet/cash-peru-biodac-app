@@ -1,0 +1,15 @@
+<component name="libraryTable">
+  <library name="Gradle: com.microsoft.identity.client:msal:4.5.0@aar">
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/transforms-3/23407ee00cbed7165ee832eacc1dc581/transformed/jetified-msal-4.5.0/jars/classes.jar!/" />
+      <root url="file://$USER_HOME$/.gradle/caches/transforms-3/23407ee00cbed7165ee832eacc1dc581/transformed/jetified-msal-4.5.0/res" />
+      <root url="file://$USER_HOME$/.gradle/caches/transforms-3/23407ee00cbed7165ee832eacc1dc581/transformed/jetified-msal-4.5.0/AndroidManifest.xml" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.microsoft.identity.client/msal/4.5.0/6ff8ba7656282a27464f084d3d25cc27c5df2682/msal-4.5.0-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.microsoft.identity.client/msal/4.5.0/7d62d200259dffb1c488ade05807df0d26ebb406/msal-4.5.0-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>
