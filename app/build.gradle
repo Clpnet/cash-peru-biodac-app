@@ -6,6 +6,7 @@ android {
     namespace 'com.acj.client.prosegur'
     compileSdk 33
 
+
     sourceSets {
         main {
             jniLibs.srcDirs = ['libs']
@@ -35,6 +36,30 @@ android {
     buildFeatures {
         viewBinding true
     }
+
+    licenses {
+        androidSdkPreviewLicense {
+            // Acepta la licencia de Android SDK Preview
+            // Agrega más licencias aquí si es necesario
+            license {
+                // Identificador de la licencia de Android SDK Preview
+                // Puedes encontrar este identificador en la carpeta $ANDROID_HOME/licenses
+                // o en la documentación oficial de Android SDK
+                id 'android-sdk-preview-license'
+                // Marca la licencia como aceptada
+                // Cambia 'true' a 'false' si deseas rechazar la licencia
+                accepted = true
+            }
+        }
+        androidSdkLicense {
+            // Acepta la licencia del SDK de Android
+            license {
+                id 'android-sdk-license'
+                accepted = true
+            }
+        }
+        }
+
 }
 
 dependencies {
